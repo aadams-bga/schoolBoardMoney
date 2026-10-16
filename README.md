@@ -6,6 +6,7 @@
 - [twoPlaybooks](https://aadams-bga.github.io/schoolBoardMoney/twoPlaybooks/)
 - [attackShare](https://aadams-bga.github.io/schoolBoardMoney/attackShare/)
 - [spendingOverTime](https://aadams-bga.github.io/schoolBoardMoney/spendingOverTime/)
+- [subdistrictMap](https://aadams-bga.github.io/schoolBoardMoney/subdistrictMap/) (add `#7A` or any subdistrict to the link to open with it selected)
 
 **Use this as the embed code**
 Change id and the slug portion of the src url
@@ -59,6 +60,7 @@ Heights are the rendered height at 640px wide; the script above resizes each one
 <iframe id="twoPlaybooks"        src="https://aadams-bga.github.io/schoolBoardMoney/twoPlaybooks/"        height="430" loading="lazy" scrolling="no" frameborder="0" style="display:block;width:100%;border:0;overflow:hidden"></iframe>
 <iframe id="attackShare"         src="https://aadams-bga.github.io/schoolBoardMoney/attackShare/"         height="439" loading="lazy" scrolling="no" frameborder="0" style="display:block;width:100%;border:0;overflow:hidden"></iframe>
 <iframe id="spendingOverTime"    src="https://aadams-bga.github.io/schoolBoardMoney/spendingOverTime/"    height="650" loading="lazy" scrolling="no" frameborder="0" style="display:block;width:100%;border:0;overflow:hidden"></iframe>
+<iframe id="subdistrictMap"      src="https://aadams-bga.github.io/schoolBoardMoney/subdistrictMap/"      height="760" loading="lazy" scrolling="no" frameborder="0" style="display:block;width:100%;border:0;overflow:hidden"></iframe>
 ```
 
 **Where the data lives**
@@ -79,6 +81,7 @@ moneyFlow/                    <- Sankey links: source, target, amount (also load
 twoPlaybooks/                 <- independent spending vs. gifts to campaigns, by camp
 attackShare/                  <- supporting vs. opposing independent expenditures, by group
 spendingOverTime/             <- daily spending by spender; the page sums it into running totals
+subdistrictMap/               <- each group's money by subdistrict, candidate and kind; also loads subdistricts.geojson (boundaries + ballot)
 
 dataDownload/
   candidates.csv              <- one row per candidate on the ballot: raised, spent, cash, outside money for/against

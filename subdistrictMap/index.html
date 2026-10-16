@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>School board money by subdistrict</title>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+    html, body { margin: 0; padding: 0; background-color: transparent; }
+    body { display: block; }
+    #chart-container-wrapper {
+        font-family: "Halyard Text", "halyard-text", "Inter", Arial, sans-serif;
+        max-width: 640px; width: 100%; min-width: 0; margin: 0 auto; position: relative; z-index: 1;
+        background-color: transparent; color: #1F161A; padding: 20px 20px 30px 20px; box-sizing: border-box;
+    }
+    #chart-container-wrapper h1 { font-size: 22px; font-weight: 700; margin: 0 0 8px 0; color: #1F161A; line-height: 1.25; letter-spacing: -0.01em; }
+    #chart-container-wrapper p.subtitle { font-size: 14px; color: #574F54; line-height: 1.45; margin: 0 0 14px 0; font-weight: 400; }
+    #chart-legend { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-bottom: 12px; font-size: 11.5px; color: #574F54; }
+    #chart-legend .legend-item { display: flex; align-items: center; gap: 6px; min-width: 0; }
+    #chart-legend .legend-rule { display: block; width: 22px; flex: 0 0 auto; background: #574F54; }
+    #chart-legend .legend-rule.dashed { height: 0; background: none; border-top: 1.5px dashed #574F54; }
+    #chart-legend .legend-rule.solid { height: 1.5px; }
+    #chart-legend .legend-swatch { display: block; width: 12px; height: 12px; flex: 0 0 auto; border: 1px solid rgba(31, 22, 26, 0.18); box-sizing: border-box; }
+    #chart-legend .legend-dot { display: block; width: 11px; height: 11px; border-radius: 50%; flex: 0 0 auto; }
+    #chart-legend svg.legend-mark { flex: 0 0 auto; }
+    #chart-container { position: relative; width: 100%; margin: 0 auto; z-index: 10; }
+    #chart-svg { display: block; width: 100%; height: auto; overflow: visible; }
+    .grid-line { stroke: #DCD4CE; stroke-width: 1px; }
+    .axis-label { font-size: 11px; fill: #6E656A; font-family: "Halyard Text", "halyard-text", "Inter", Arial, sans-serif; }
+    .axis-line { stroke: #B9B0AB; stroke-width: 1px; }
+    .series-label { font-family: "Halyard Text", "halyard-text", "Inter", Arial, sans-serif; font-size: 11.5px; font-weight: 700; line-height: 1.2; }
+    .value-label { font-family: "Halyard Text", "halyard-text", "Inter", Arial, sans-serif; font-size: 11.5px; font-weight: 600; fill: #1F161A; font-variant-numeric: tabular-nums; }
+    .row-label { font-family: "Halyard Text", "halyard-text", "Inter", Arial, sans-serif; font-size: 12.5px; font-weight: 700; fill: #1F161A; }
+    .name-label { font-family: "Halyard Text", "halyard-text", "Inter", Arial, sans-serif; font-size: 11px; fill: #574F54; }
+    .note-label { font-family: "Halyard Text", "halyard-text", "Inter", Arial, sans-serif; font-size: 11px; fill: #574F54; font-style: italic; }
+    .halo { paint-order: stroke; stroke: #FFFFFF; stroke-width: 3px; stroke-linejoin: round; }
+    .marker-rule { stroke: #1F161A; stroke-width: 1px; stroke-dasharray: 2 3; opacity: 0.65; }
+    .hit { cursor: pointer; }
+    #chart-tooltip {
+        position: absolute; pointer-events: none; display: none; background-color: #FFFFFF; border: 1px solid #B9B0AB;
+        box-shadow: 3px 3px 0 rgba(31, 22, 26, 0.12); padding: 8px 11px; font-size: 12px; color: #1F161A; z-index: 100; line-height: 1.45; max-width: 260px;
+    }
+    #chart-tooltip .tooltip-header { font-weight: 700; margin-bottom: 4px; }
+    #chart-tooltip .tooltip-row { display: flex; align-items: baseline; gap: 6px; white-space: nowrap; }
+    #chart-tooltip .tooltip-swatch { width: 8px; height: 8px; flex: 0 0 auto; }
+    #chart-tooltip .tooltip-name { color: #574F54; }
+    #chart-tooltip .tooltip-value { font-weight: 700; margin-left: auto; padding-left: 10px; }
+    #chart-tooltip .tooltip-note { color: #574F54; white-space: normal; }
+    .graph-footer { margin-top: 22px; padding-top: 12px; border-top: 1px solid #DCD4CE; font-size: 11px; color: #6E656A; line-height: 1.4; position: relative; z-index: 1; }
+    .graph-footer a { color: inherit; text-decoration: underline; }
+    .graph-footer .footer-note { margin-bottom: 5px; }
+    .iap-logo { position: absolute; bottom: 10px; right: 10px; width: 150px; opacity: 0.09; z-index: -99999; pointer-events: none; }
+    @media (max-width: 500px) {
+        #chart-container-wrapper { padding: 15px 15px 25px 15px; }
+        #chart-container-wrapper h1 { font-size: 18px; }
+        #chart-container-wrapper p.subtitle { font-size: 12.5px; margin-bottom: 12px; }
+        #chart-legend { font-size: 10.5px; gap: 4px 14px; }
+        .graph-footer { font-size: 10px; }
+        .iap-logo { width: 110px; }
+        .axis-label, .name-label, .note-label { font-size: 10px; }
+        .series-label, .value-label { font-size: 10.5px; }
+        .row-label { font-size: 11.5px; }
+    }
+
+    #chart-wrapper { display: flex; gap: 18px; align-items: flex-start; }
+    #chart-container { flex: 1 1 58%; min-width: 0; }
+    #map-panel { flex: 0 0 40%; min-width: 0; font-size: 12px; color: #1F161A; }
+    #map-panel h2 { font-size: 16px; font-weight: 700; margin: 0 0 2px 0; }
+    #map-panel .panel-cands { color: #574F54; font-size: 11.5px; line-height: 1.4; margin-bottom: 10px; }
+    #map-panel .panel-group { margin-bottom: 8px; }
+    #map-panel .panel-row { display: flex; align-items: baseline; gap: 6px; font-weight: 700; }
+    #map-panel .panel-row .amt { margin-left: auto; font-variant-numeric: tabular-nums; }
+    #map-panel .panel-row.zero { color: #9A9195; font-weight: 400; }
+    #map-panel .swatch { width: 9px; height: 9px; flex: 0 0 auto; }
+    #map-panel .bar { height: 5px; margin: 3px 0 2px 15px; background: #EEE9E4; }
+    #map-panel .bar span { display: block; height: 100%; }
+    #map-panel .detail { margin-left: 15px; color: #574F54; font-size: 11px; line-height: 1.4; }
+    #map-panel .detail div { display: flex; gap: 6px; }
+    #map-panel .detail .amt { margin-left: auto; font-variant-numeric: tabular-nums; }
+    #map-panel .panel-total { border-top: 1px solid #DCD4CE; padding-top: 6px; margin-top: 4px; display: flex; font-weight: 700; }
+    #map-panel .panel-total .amt { margin-left: auto; }
+    #map-panel .hint { color: #6E656A; font-size: 11px; margin-top: 8px; font-style: italic; }
+    #chart-legend { flex-direction: column; align-items: flex-start; gap: 8px; }
+    .color-by { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+    .color-by .lbl { font-weight: 600; color: #1F161A; margin-right: 4px; }
+    .color-by button { font: inherit; font-size: 11.5px; padding: 3px 8px; border: 1px solid #CBC4BE; background: #FFFFFF; color: #1F161A; cursor: pointer; border-radius: 2px; }
+    .color-by button[aria-pressed="true"] { background: #1F161A; color: #FFFFFF; border-color: #1F161A; }
+    .ramp { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #574F54; }
+    .ramp .grad { width: 140px; height: 9px; border: 1px solid rgba(31, 22, 26, 0.18); }
+    .district { stroke: #FFFFFF; stroke-width: 1px; cursor: pointer; }
+    .district:focus { outline: none; }
+    .district.active { stroke: #1F161A; stroke-width: 2px; }
+    .district-label { font-family: "Halyard Text", "halyard-text", "Inter", Arial, sans-serif; font-size: 10px; font-weight: 700; pointer-events: none; text-anchor: middle; }
+    @media (max-width: 500px) {
+        #chart-wrapper { flex-direction: column; }
+        #chart-container, #map-panel { flex: 1 1 auto; width: 100%; }
+    }
+
+</style>
+</head>
+<body>
+
+<div id="chart-container-wrapper">
+
+    <h1>Lorem ipsum dolor sit amet, consectetur adipiscing elit</h1>
+    <p class="subtitle">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.</p>
+
+    <div id="chart-legend"></div>
+
+    <div id="chart-wrapper" style="position: relative;">
+        <div id="chart-container">
+            <svg id="chart-svg"></svg>
+        </div>
+        <div id="chart-tooltip"></div>
+    </div>
+
+    <footer class="graph-footer">
+        <div class="footer-note">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Board president race not shown. Boundaries: &ldquo;School Board District&rdquo; layer on ArcGIS Online, not an official Chicago Board of Elections file.</div>
+        Chart: Andrew Adams, Illinois Answers Project &middot; Source: Illinois Answers Project analysis of Illinois State Board of Elections records &middot; <a href="https://cdn.jsdelivr.net/gh/aadams-bga/schoolBoardMoney@main/subdistrictMap/subdistrictMap.csv" target="_blank" rel="noopener">Download the data</a>
+    </footer>
+    <img src="https://raw.githubusercontent.com/aadams-bga/images/bffe8cc967881aeed4fbdee8328f4b2e056159b9/iaplogo.svg" class="iap-logo" alt="Illinois Answers Project logo">
+</div>
+
+<script>
+(function () {
+
+    const MAROON = "#8A2C38";
+    const MAROON_LIGHT = "#BE8A91";
+    const STEEL = "#53646D";
+    const STEEL_LIGHT = "#A3AFB5";
+    const AMBER = "#C06621";
+    const SAGE = "#353B32";
+    const INK = "#1F161A";
+    const NEUTRAL = "#8A827F";
+    const GRAY_LIGHT = "#CBC4BE";
+    const FAINT = "#D8D2CC";
+
+    // one color per group, the same in every graphic in this package
+    const GROUP_COLOR = {
+        "Common Ground": MAROON, "INCS Action": STEEL, "Urban Center": MAROON_LIGHT, "SEIU": SAGE,
+        "CTU / Our Schools": AMBER, "Candidates' campaigns": NEUTRAL
+    };
+
+    const container = d3.select("#chart-container");
+    const svg = d3.select("#chart-svg");
+    const tooltip = d3.select("#chart-tooltip");
+    const wrapperNode = d3.select("#chart-wrapper").node();
+
+    function num(v) {
+        if (v == null) return null;
+        const s = String(v).trim();
+        if (s === "") return null;
+        const n = +s;
+        return Number.isFinite(n) ? n : null;
+    }
+
+    function esc(s) {
+        return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) {
+            return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c];
+        });
+    }
+
+    const dollars = d3.format("$,.0f");
+    function money(v) {
+        if (v >= 1e6) return "$" + (v / 1e6).toFixed(2) + "M";
+        if (v >= 1e3) return "$" + Math.round(v / 1e3) + "K";
+        return dollars(v);
+    }
+
+    function row(name, value, color) {
+        return '<div class="tooltip-row">' + (color ? '<span class="tooltip-swatch" style="background:' + color + '"></span>' : "") +
+            '<span class="tooltip-name">' + esc(name) + '</span><span class="tooltip-value">' + value + "</span></div>";
+    }
+
+    function placeTooltip(event, width, height) {
+        const node = tooltip.node();
+        const tw = node.offsetWidth;
+        const th = node.offsetHeight;
+        const [px, py] = d3.pointer(event, wrapperNode);
+        let left = px + 16;
+        if (left + tw > width - 4) left = px - tw - 16;
+        if (left < 4) left = 4;
+        let top = py - th / 2;
+        if (top < 4) top = 4;
+        if (top + th > height - 4) top = height - th - 4;
+        tooltip.style("left", left + "px").style("top", top + "px");
+    }
+
+    function hover(selection, html, width, height) {
+        selection.classed("hit", true)
+            .on("mouseenter mousemove", function (event, d) {
+                tooltip.style("display", "block").html(html(d));
+                placeTooltip(event, width, height);
+            })
+            .on("mouseleave", function () { tooltip.style("display", "none"); });
+    }
+
+    // diagonal hatch in a group's color, for spending after Sept. 30 / undisclosed money
+    function hatch(defs, id, color) {
+        const p = defs.append("pattern").attr("id", id).attr("width", 6).attr("height", 6)
+            .attr("patternUnits", "userSpaceOnUse").attr("patternTransform", "rotate(45)");
+        p.append("rect").attr("width", 6).attr("height", 6).attr("fill", color).attr("fill-opacity", 0.25);
+        p.append("line").attr("x1", 0).attr("y1", 0).attr("x2", 0).attr("y2", 6).attr("stroke", color).attr("stroke-width", 2.6);
+        return "url(#" + id + ")";
+    }
+
+
+    const GROUPS = ["Common Ground", "INCS Action", "Urban Center", "CTU / Our Schools", "SEIU"];
+    const KIND_ORDER = ["Ads supporting", "Ads opposing", "Gifts and in-kind"];
+    const MODES = [["Total", "All five groups"]].concat(GROUPS.map(g => [g, g]));
+    const RAMP_END = Object.assign({ "Total": INK }, GROUP_COLOR);
+    const ZERO = "#EEE9E4";
+    let features = null, lines = null, mode = "Total", pinned = null, hovered = null;
+
+    Promise.all([d3.json("subdistricts.geojson"), d3.csv("subdistrictMap.csv", d => ({ race: d.race, candidate: d.candidate, group: d.group, kind: d.kind, amount: num(d.amount) || 0 }))])
+        .then(function ([geo, rows]) {
+            // planar map: scale longitude by cos(latitude) so Chicago isn't stretched
+            const k = Math.cos(41.84 * Math.PI / 180);
+            geo.features.forEach(f => f.geometry.coordinates.forEach(poly => poly.forEach(ring => ring.forEach(pt => { pt[0] *= k; }))));
+            features = geo.features;
+            lines = rows;
+            // a link ending in #7A (or any subdistrict) opens with that subdistrict selected
+            const h = decodeURIComponent(location.hash.slice(1)).toUpperCase();
+            if (features.some(f => f.properties.race === h)) pinned = h;
+            // the panel has to exist before the first render so the map is sized to the space beside it
+            d3.select("#chart-wrapper").append("div").attr("id", "map-panel").attr("aria-live", "polite");
+            buildControls();
+            render();
+            showPanel(pinned);
+            window.addEventListener("resize", render);
+        });
+
+    function amountFor(race, m) {
+        return d3.sum(lines, l => l.race === race && (m === "Total" || l.group === m) ? l.amount : 0);
+    }
+
+    function buildControls() {
+        const legend = d3.select("#chart-legend").html("");
+        const row = legend.append("div").attr("class", "color-by").attr("role", "group").attr("aria-label", "Color map by");
+        row.append("span").attr("class", "lbl").text("Color map by:");
+        row.selectAll("button").data(MODES).join("button").attr("type", "button")
+            .text(d => d[1]).attr("aria-pressed", d => String(d[0] === mode))
+            .on("click", function (event, d) {
+                mode = d[0];
+                row.selectAll("button").attr("aria-pressed", x => String(x[0] === mode));
+                render();
+            });
+        legend.append("div").attr("class", "ramp");
+    }
+
+    function render() {
+        if (!features) return;
+        svg.selectAll("*").remove();
+        const width = container.node().getBoundingClientRect().width;
+        if (!width) return;
+        const height = Math.round(width * 1.3);
+        svg.attr("width", width).attr("height", height).attr("viewBox", "0 0 " + width + " " + height).attr("preserveAspectRatio", "xMinYMin meet");
+        const fc = { type: "FeatureCollection", features: features };
+        const proj = d3.geoIdentity().reflectY(true).fitSize([width, height], fc);
+        const path = d3.geoPath(proj);
+
+        const vals = new Map(features.map(f => [f.properties.race, amountFor(f.properties.race, mode)]));
+        const max = d3.max(vals.values()) || 1;
+        const color = d3.scaleLinear().domain([0, max]).range(["#F3EEE9", RAMP_END[mode]]).interpolate(d3.interpolateLab);
+        const fill = v => v > 0 ? color(v) : ZERO;
+
+        const ramp = d3.select("#chart-legend .ramp").html("");
+        ramp.append("span").text("$0");
+        ramp.append("span").attr("class", "grad").style("background", "linear-gradient(to right, #F3EEE9, " + RAMP_END[mode] + ")");
+        ramp.append("span").text(money(max));
+
+        const g = svg.append("g");
+        g.selectAll("path").data(features).join("path")
+            .attr("class", d => "district" + (d.properties.race === (hovered || pinned) ? " active" : ""))
+            .attr("d", path).attr("fill", d => fill(vals.get(d.properties.race)))
+            .attr("tabindex", 0).attr("role", "button")
+            .attr("aria-label", d => "Subdistrict " + d.properties.race + ": " + money(vals.get(d.properties.race)))
+            .on("mouseenter", function (event, d) { hovered = d.properties.race; mark(); showPanel(hovered); })
+            .on("mouseleave", function () { hovered = null; mark(); showPanel(pinned); })
+            .on("click", function (event, d) { pinned = pinned === d.properties.race ? null : d.properties.race; mark(); showPanel(pinned || hovered); })
+            .on("focus", function (event, d) { pinned = d.properties.race; mark(); showPanel(pinned); })
+            .on("keydown", function (event, d) { if (event.key === "Escape") { pinned = null; mark(); showPanel(null); this.blur(); } });
+        // raise the active outline above its neighbors
+        function mark() {
+            const a = hovered || pinned;
+            g.selectAll("path.district").classed("active", d => d.properties.race === a).filter(d => d.properties.race === a).raise();
+            g.selectAll("text").raise();
+        }
+
+        g.selectAll("text").data(features).join("text").attr("class", "district-label")
+            .attr("x", d => path.centroid(d)[0]).attr("y", d => path.centroid(d)[1]).attr("dy", "0.35em")
+            .attr("fill", d => d3.hsl(fill(vals.get(d.properties.race))).l < 0.55 ? "#FFFFFF" : INK)
+            .text(d => d.properties.race);
+        mark();
+    }
+
+    function showPanel(race) {
+        const panel = d3.select("#map-panel");
+        const rows = race ? lines.filter(l => l.race === race) : lines;
+        const totals = GROUPS.map(gp => [gp, d3.sum(rows, l => l.group === gp ? l.amount : 0)]);
+        const maxG = d3.max(totals, t => t[1]) || 1;
+        let html = "";
+        if (race) {
+            const f = features.find(x => x.properties.race === race);
+            html += "<h2>Subdistrict " + esc(race) + "</h2><div class='panel-cands'>" +
+                f.properties.candidates.map(c => esc(c.name) + (c.incumbent ? " (incumbent)" : "")).join("<br>") + "</div>";
+        } else {
+            html += "<h2>All 20 subdistricts</h2><div class='panel-cands'>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</div>";
+        }
+        totals.forEach(function ([gp, v]) {
+            html += "<div class='panel-group'><div class='panel-row" + (v ? "" : " zero") + "'><span class='swatch' style='background:" + GROUP_COLOR[gp] + "'></span>" +
+                esc(gp) + "<span class='amt'>" + (v ? dollars(v) : "$0") + "</span></div>";
+            if (v) {
+                html += "<div class='bar'><span style='width:" + (100 * v / maxG) + "%;background:" + GROUP_COLOR[gp] + "'></span></div>";
+                if (race) {
+                    const parts = rows.filter(l => l.group === gp).sort((a, b) => KIND_ORDER.indexOf(a.kind) - KIND_ORDER.indexOf(b.kind) || b.amount - a.amount);
+                    html += "<div class='detail'>" + parts.map(l => "<div><span>" + esc(l.kind) + " " + esc(l.candidate) + "</span><span class='amt'>" + dollars(l.amount) + "</span></div>").join("") + "</div>";
+                }
+            }
+            html += "</div>";
+        });
+        html += "<div class='panel-total'>Total<span class='amt'>" + dollars(d3.sum(totals, t => t[1])) + "</span></div>";
+        html += "<div class='hint'>" + (race ? (pinned ? "Click the subdistrict again to clear." : "Click to keep this subdistrict selected.") : "Hover over or tap a subdistrict for details.") + "</div>";
+        panel.html(html);
+    }
+
+
+    (function () {
+        if (window.parent === window) return;
+        let last = 0;
+        function send(force) {
+            const h = Math.ceil(document.documentElement.getBoundingClientRect().height);
+            if (!h || (!force && Math.abs(h - last) < 2)) return;
+            last = h;
+            window.parent.postMessage({ type: "iap-graphic-height", id: "subdistrictMap", height: h }, "*");
+        }
+        window.addEventListener("load", send);
+        window.addEventListener("resize", send);
+        if (window.ResizeObserver) new ResizeObserver(send).observe(document.body);
+        setTimeout(send, 300);
+        setTimeout(send, 1200);
+        window.addEventListener("message", function (e) {
+            if (e.data && e.data.type === "iap-graphic-request") send(true);
+        });
+    })();
+
+})();
+</script>
+</body>
+</html>
