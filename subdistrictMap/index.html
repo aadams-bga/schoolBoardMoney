@@ -71,18 +71,20 @@
     #chart-wrapper { display: flex; gap: 18px; align-items: flex-start; }
     #chart-container { flex: 1 1 58%; min-width: 0; }
     #map-panel { flex: 0 0 40%; min-width: 0; font-size: 12px; color: #1F161A; }
-    #map-panel h2 { font-size: 16px; font-weight: 700; margin: 0 0 2px 0; }
-    #map-panel .panel-cands { color: #574F54; font-size: 11.5px; line-height: 1.4; margin-bottom: 10px; }
-    #map-panel .panel-group { margin-bottom: 8px; }
-    #map-panel .panel-row { display: flex; align-items: baseline; gap: 6px; font-weight: 700; }
-    #map-panel .panel-row .amt { margin-left: auto; font-variant-numeric: tabular-nums; }
-    #map-panel .panel-row.zero { color: #9A9195; font-weight: 400; }
-    #map-panel .swatch { width: 9px; height: 9px; flex: 0 0 auto; }
-    #map-panel .bar { height: 5px; margin: 3px 0 2px 15px; background: #EEE9E4; }
-    #map-panel .bar span { display: block; height: 100%; }
-    #map-panel .detail { margin-left: 15px; color: #574F54; font-size: 11px; line-height: 1.4; }
-    #map-panel .detail div { display: flex; gap: 6px; }
-    #map-panel .detail .amt { margin-left: auto; font-variant-numeric: tabular-nums; }
+    #map-panel h2 { font-size: 16px; font-weight: 700; margin: 0 0 8px 0; }
+    #map-panel .reset { font: inherit; font-size: 11.5px; padding: 3px 8px; margin: 0 0 8px 0; border: 1px solid #CBC4BE; background: #FFFFFF; color: #1F161A; cursor: pointer; border-radius: 2px; }
+    #map-panel .key { display: flex; flex-wrap: wrap; gap: 3px 10px; font-size: 10.5px; color: #574F54; margin-bottom: 10px; }
+    #map-panel .key span { display: inline-flex; align-items: center; gap: 4px; }
+    #map-panel .key i { width: 9px; height: 9px; display: inline-block; }
+    #map-panel .cand { margin-bottom: 9px; }
+    #map-panel .cand-name { display: flex; align-items: baseline; gap: 6px; font-weight: 700; font-size: 12px; }
+    #map-panel .cand-name .race { color: #6E656A; font-weight: 600; }
+    #map-panel .cand-name .amt { margin-left: auto; font-variant-numeric: tabular-nums; }
+    #map-panel .cand-name.none { font-weight: 400; color: #9A9195; }
+    #map-panel .stack { display: flex; align-items: center; gap: 6px; margin-top: 3px; }
+    #map-panel .stack .track { flex: 1 1 auto; display: flex; height: 10px; }
+    #map-panel .stack .track span { height: 100%; margin-right: 1px; }
+    #map-panel .stack .lbl { flex: 0 0 auto; font-size: 10.5px; color: #574F54; font-variant-numeric: tabular-nums; min-width: 72px; text-align: right; }
     #map-panel .panel-total { border-top: 1px solid #DCD4CE; padding-top: 6px; margin-top: 4px; display: flex; font-weight: 700; }
     #map-panel .panel-total .amt { margin-left: auto; }
     #map-panel .hint { color: #6E656A; font-size: 11px; margin-top: 8px; font-style: italic; }
@@ -212,7 +214,6 @@
 
 
     const GROUPS = ["Common Ground", "INCS Action", "Urban Center", "CTU / Our Schools", "SEIU"];
-    const KIND_ORDER = ["Ads supporting", "Ads opposing", "Gifts and in-kind"];
     const MODES = [["Total", "All five groups"]].concat(GROUPS.map(g => [g, g]));
     const RAMP_END = Object.assign({ "Total": INK }, GROUP_COLOR);
     const ZERO = "#EEE9E4";
@@ -233,6 +234,7 @@
             buildControls();
             render();
             showPanel(pinned);
+            document.addEventListener("keydown", e => { if (e.key === "Escape") clearSelection(); });
             window.addEventListener("resize", render);
         });
 
@@ -275,6 +277,8 @@
         ramp.append("span").attr("class", "grad").style("background", "linear-gradient(to right, #F3EEE9, " + RAMP_END[mode] + ")");
         ramp.append("span").text(money(max));
 
+        // clicking empty space around the map, or pressing Escape, goes back to all of Chicago
+        svg.append("rect").attr("width", width).attr("height", height).attr("fill", "transparent").on("click", clearSelection);
         const g = svg.append("g");
         g.selectAll("path").data(features).join("path")
             .attr("class", d => "district" + (d.properties.race === (hovered || pinned) ? " active" : ""))
@@ -285,7 +289,7 @@
             .on("mouseleave", function () { hovered = null; mark(); showPanel(pinned); })
             .on("click", function (event, d) { pinned = pinned === d.properties.race ? null : d.properties.race; mark(); showPanel(pinned || hovered); })
             .on("focus", function (event, d) { pinned = d.properties.race; mark(); showPanel(pinned); })
-            .on("keydown", function (event, d) { if (event.key === "Escape") { pinned = null; mark(); showPanel(null); this.blur(); } });
+            .on("keydown", function (event) { if (event.key === "Escape") { clearSelection(); this.blur(); } });
         // raise the active outline above its neighbors
         function mark() {
             const a = hovered || pinned;
@@ -300,34 +304,68 @@
         mark();
     }
 
+    const STRIPE = c => "repeating-linear-gradient(45deg, " + c + " 0 2px, transparent 2px 4px)";
+
+    function clearSelection() { pinned = null; hovered = null; svg.selectAll("path.district").classed("active", false); showPanel(null); }
+
+    // one stacked bar: segments by group, solid for money helping the candidate, striped for ads against
+    function stack(parts, scale, against, total) {
+        if (!total) return "";
+        return "<div class='stack'><div class='track'>" + parts.filter(p => p.v > 0).map(p =>
+            "<span data-tip='" + esc(JSON.stringify(p.tip)).replace(/'/g, "&#39;") + "' style='width:" + (100 * p.v / scale) + "%;background:" + (against ? STRIPE(GROUP_COLOR[p.g]) : GROUP_COLOR[p.g]) + "'></span>").join("") +
+            "</div><span class='lbl'>" + (against ? "against " : "") + money(total) + "</span></div>";
+    }
+
+    function candidateRows(rows, cands, showRace) {
+        // per candidate: money for (ads supporting + gifts) and ads against, split by group
+        const data = cands.map(function (c) {
+            const mine = rows.filter(l => l.candidate === c.name && l.race === c.race);
+            const part = (g, against) => {
+                const ls = mine.filter(l => l.group === g && (l.kind === "Ads opposing") === against);
+                return { g: g, v: d3.sum(ls, l => l.amount), tip: { g: g, c: c.name, rows: ls.map(l => [l.kind, l.amount]) } };
+            };
+            const forP = GROUPS.map(g => part(g, false)), agP = GROUPS.map(g => part(g, true));
+            return { c: c, forP: forP, agP: agP, forT: d3.sum(forP, p => p.v), agT: d3.sum(agP, p => p.v) };
+        });
+        const scale = d3.max(data, d => Math.max(d.forT, d.agT)) || 1;
+        return data.map(d => "<div class='cand'><div class='cand-name" + (d.forT + d.agT ? "" : " none") + "'>" +
+            (showRace ? "<span class='race'>" + esc(d.c.race) + "</span>" : "") + esc(d.c.name) + (d.c.incumbent ? " (inc.)" : "") +
+            (d.forT + d.agT ? "" : "<span class='amt'>$0</span>") + "</div>" +
+            stack(d.forP, scale, false, d.forT) + stack(d.agP, scale, true, d.agT) + "</div>").join("");
+    }
+
     function showPanel(race) {
         const panel = d3.select("#map-panel");
         const rows = race ? lines.filter(l => l.race === race) : lines;
-        const totals = GROUPS.map(gp => [gp, d3.sum(rows, l => l.group === gp ? l.amount : 0)]);
-        const maxG = d3.max(totals, t => t[1]) || 1;
         let html = "";
         if (race) {
-            const f = features.find(x => x.properties.race === race);
-            html += "<h2>Subdistrict " + esc(race) + "</h2><div class='panel-cands'>" +
-                f.properties.candidates.map(c => esc(c.name) + (c.incumbent ? " (incumbent)" : "")).join("<br>") + "</div>";
+            html += "<button type='button' class='reset'>&larr; All of Chicago</button>";
+            html += "<h2>Subdistrict " + esc(race) + "</h2>";
         } else {
-            html += "<h2>All 20 subdistricts</h2><div class='panel-cands'>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</div>";
+            html += "<h2>All 20 subdistricts</h2>";
         }
-        totals.forEach(function ([gp, v]) {
-            html += "<div class='panel-group'><div class='panel-row" + (v ? "" : " zero") + "'><span class='swatch' style='background:" + GROUP_COLOR[gp] + "'></span>" +
-                esc(gp) + "<span class='amt'>" + (v ? dollars(v) : "$0") + "</span></div>";
-            if (v) {
-                html += "<div class='bar'><span style='width:" + (100 * v / maxG) + "%;background:" + GROUP_COLOR[gp] + "'></span></div>";
-                if (race) {
-                    const parts = rows.filter(l => l.group === gp).sort((a, b) => KIND_ORDER.indexOf(a.kind) - KIND_ORDER.indexOf(b.kind) || b.amount - a.amount);
-                    html += "<div class='detail'>" + parts.map(l => "<div><span>" + esc(l.kind) + " " + esc(l.candidate) + "</span><span class='amt'>" + dollars(l.amount) + "</span></div>").join("") + "</div>";
-                }
-            }
-            html += "</div>";
-        });
-        html += "<div class='panel-total'>Total<span class='amt'>" + dollars(d3.sum(totals, t => t[1])) + "</span></div>";
-        html += "<div class='hint'>" + (race ? (pinned ? "Click the subdistrict again to clear." : "Click to keep this subdistrict selected.") : "Hover over or tap a subdistrict for details.") + "</div>";
+        html += "<div class='key'>" + GROUPS.map(g => "<span><i style='background:" + GROUP_COLOR[g] + "'></i>" + esc(g) + "</span>").join("") +
+            "<span><i style='background:" + STRIPE("#574F54") + "'></i>Ads against</span></div>";
+        if (race) {
+            const f = features.find(x => x.properties.race === race);
+            html += candidateRows(rows, f.properties.candidates.map(c => ({ name: c.name, incumbent: c.incumbent, race: race })), false);
+        } else {
+            // citywide: the candidates with the most outside money for or against them
+            const all = features.flatMap(f => f.properties.candidates.map(c => ({ name: c.name, incumbent: c.incumbent, race: f.properties.race })));
+            const tot = c => d3.sum(lines, l => l.candidate === c.name && l.race === c.race ? l.amount : 0);
+            html += "<div class='hint' style='margin:0 0 8px 0'>Top 8 candidates by outside money</div>";
+            html += candidateRows(lines, all.sort((a, b) => tot(b) - tot(a)).slice(0, 8), true);
+        }
+        html += "<div class='panel-total'>Total<span class='amt'>" + dollars(d3.sum(rows, l => l.amount)) + "</span></div>";
+        html += "<div class='hint'>" + (race ? (pinned ? "Click again or press Esc to return to all of Chicago." : "Click to keep this subdistrict selected.") : "Hover over or tap a subdistrict for details.") + "</div>";
         panel.html(html);
+        panel.select(".reset").on("click", clearSelection);
+        const width = d3.select("#chart-wrapper").node().getBoundingClientRect().width;
+        const height = d3.select("#chart-wrapper").node().getBoundingClientRect().height;
+        panel.selectAll(".track span").each(function () {
+            const t = JSON.parse(this.getAttribute("data-tip"));
+            d3.select(this).datum(t).call(hover, d => '<div class="tooltip-header">' + esc(d.g) + "</div>" + d.rows.map(r => row(r[0] + " " + d.c, dollars(r[1]))).join(""), width, height);
+        });
     }
 
 
