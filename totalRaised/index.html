@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Subdistrict candidates' cash on hand</title>
+<title>Subdistrict candidates' total fundraising</title>
 
 <script src="https://d3js.org/d3.v7.min.js"></script>
 
@@ -77,7 +77,7 @@
     <h1>Lorem ipsum dolor sit amet, consectetur adipiscing elit</h1>
     <p class="subtitle">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
 
-    <div id="chart-legend"><span class="legend-item"><span class="legend-swatch" style="background:#574F54;"></span>Cash on hand, Sept. 30</span><span class="legend-item"><span class="legend-swatch" style="background:#B9B0AB;"></span>Cash gifts and transfers since (A-1 reports)</span><span class="legend-item"><span class="legend-swatch" style="background:#8A827F;background-image:repeating-linear-gradient(45deg, #8A827F 0 2px, transparent 2px 5px);background-color:transparent"></span>In-kind help since (A-1 reports)</span><span class="legend-item">* Incumbent</span></div>
+    <div id="chart-legend"><span class="legend-item"><span class="legend-swatch" style="background:#B9B0AB;"></span>All other donors</span><span class="legend-item"><span class="legend-swatch" style="background:#8A827F;background-image:repeating-linear-gradient(45deg, #8A827F 0 2px, transparent 2px 5px);background-color:transparent"></span>Loans</span><span class="legend-item"><span class="legend-swatch" style="background:#C06621;"></span>CTU / Our Schools</span><span class="legend-item"><span class="legend-swatch" style="background:#353B32;"></span>SEIU</span><span class="legend-item"><span class="legend-swatch" style="background:#8A2C38;"></span>Common Ground</span><span class="legend-item"><span class="legend-swatch" style="background:#53646D;"></span>INCS Action</span><span class="legend-item"><span class="legend-swatch" style="background:#BE8A91;"></span>Urban Center</span><span class="legend-item">* Incumbent</span></div>
 
     <div id="chart-wrapper" style="position: relative;">
         <div id="chart-container">
@@ -87,8 +87,8 @@
     </div>
 
     <footer class="graph-footer">
-        <div class="footer-note">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cash on hand is ending funds on each candidate's latest D-2 quarterly report; A-1s are large-contribution reports dated after that report's period. Board president race not shown.</div>
-        Chart: Andrew Adams, Illinois Answers Project &middot; Source: Illinois Answers Project analysis of Illinois State Board of Elections records &middot; <a href="https://cdn.jsdelivr.net/gh/aadams-bga/schoolBoardMoney@main/cashOnHand/cashOnHand.csv" target="_blank" rel="noopener">Download the data</a>
+        <div class="footer-note">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Total raised is D-2 receipts and in-kind help since Jan. 1, 2025, plus large-contribution (A-1) reports since the latest D-2. Group amounts include in-kind help. Board president race not shown.</div>
+        Chart: Andrew Adams, Illinois Answers Project &middot; Source: Illinois Answers Project analysis of Illinois State Board of Elections records &middot; <a href="https://cdn.jsdelivr.net/gh/aadams-bga/schoolBoardMoney@main/totalRaised/totalRaised.csv" target="_blank" rel="noopener">Download the data</a>
     </footer>
     <img src="https://raw.githubusercontent.com/aadams-bga/images/bffe8cc967881aeed4fbdee8328f4b2e056159b9/iaplogo.svg" class="iap-logo" alt="Illinois Answers Project logo">
 </div>
@@ -177,17 +177,19 @@
     }
 
 
-    const CASH = "#574F54", A1 = "#B9B0AB", IK = "#8A827F";
+    const OTHER = "#B9B0AB", LOAN = "#8A827F";
+    const SOURCES = ["All other donors", "Loans", "CTU / Our Schools", "SEIU", "Common Ground", "INCS Action", "Urban Center"];
+    const COLOR = Object.assign({ "All other donors": OTHER, "Loans": LOAN }, GROUP_COLOR);
     const RACES = ["1A", "1B", "2A", "2B", "3A", "3B", "4A", "4B", "5A", "5B", "6A", "6B", "7A", "7B", "8A", "8B", "9A", "9B", "10A", "10B"];
-    const fmtEnd = d3.timeFormat("%b. %-d, %Y");
     let data = null;
 
-    d3.csv("cashOnHand.csv", d => ({
-        race: d.race, candidate: d.candidate, incumbent: d.incumbent === "1", end: d.latest_d2_period_end ? new Date(d.latest_d2_period_end + "T12:00:00") : null,
-        cash: num(d.cash_on_hand), a1: num(d.a1_cash_since) || 0, ik: num(d.a1_inkind_since) || 0
-    })).then(function (rows) {
-        // within each subdistrict, the candidate with the most money first
-        data = rows.sort((a, b) => RACES.indexOf(a.race) - RACES.indexOf(b.race) || ((b.cash || 0) + b.a1 + b.ik) - ((a.cash || 0) + a.a1 + a.ik));
+    d3.csv("totalRaised.csv", function (d) {
+        const o = { race: d.race, candidate: d.candidate, incumbent: d.incumbent === "1", filed: d.filed_d2 === "1", total: num(d.total_raised) || 0 };
+        SOURCES.forEach(k => { o[k] = num(d[k]) || 0; });
+        return o;
+    }).then(function (rows) {
+        // within each subdistrict, the candidate who raised the most first
+        data = rows.sort((a, b) => RACES.indexOf(a.race) - RACES.indexOf(b.race) || b.total - a.total);
         render();
         window.addEventListener("resize", render);
     });
@@ -210,12 +212,10 @@
         const height = y + 4;
         svg.attr("width", width).attr("height", height).attr("viewBox", "0 0 " + width + " " + height).attr("preserveAspectRatio", "xMinYMin meet");
         const x0 = raceW + nameW, plotW = width - x0 - valueW;
-        const max = d3.max(data, d => (d.cash || 0) + d.a1 + d.ik);
-        const x = d3.scaleLinear().domain([0, max]).range([0, plotW]);
+        const x = d3.scaleLinear().domain([0, d3.max(data, d => d.total)]).range([0, plotW]);
         const defs = svg.append("defs");
-        const ikFill = hatch(defs, "ik-hatch", IK);
+        const loanFill = hatch(defs, "loan-hatch", LOAN);
 
-        // light vertical gridlines
         x.ticks(isMobile ? 3 : 4).forEach(function (v) {
             svg.append("line").attr("class", "grid-line").attr("x1", x0 + x(v)).attr("x2", x0 + x(v)).attr("y1", 0).attr("y2", height);
         });
@@ -229,24 +229,24 @@
             // on phones, drop nicknames and middle initials so names fit beside the bars
             const name = (isMobile ? d.candidate.replace(/ "[^"]*"/, "").replace(/ [A-Z]\.(?= )/g, "") : d.candidate) + (d.incumbent ? " *" : "");
             svg.append("text").attr("class", "name-label").attr("x", raceW).attr("y", cy).attr("dy", "0.32em").attr("fill", INK).text(name);
-            if (d.cash === null) {
+            if (!d.filed) {
                 svg.append("text").attr("class", "note-label").attr("x", x0).attr("y", cy).attr("dy", "0.32em").text("No report filed");
                 return;
             }
-            const segs = [["Cash on hand", d.cash, CASH], ["Cash gifts and transfers since (A-1s)", d.a1, A1], ["In-kind help since (A-1s)", d.ik, ikFill]];
-            let at = 0;
             const tip = () => '<div class="tooltip-header">' + esc(d.candidate) + " (" + esc(d.race) + ")</div>" +
-                row("Cash on hand, " + fmtEnd(d.end), dollars(d.cash), CASH) + row("Cash gifts and transfers since", dollars(d.a1), A1) +
-                row("In-kind help since", dollars(d.ik), IK) + '<div class="tooltip-note">Total ' + dollars(d.cash + d.a1 + d.ik) + "</div>";
-            segs.forEach(function ([label, v, fill], i) {
+                SOURCES.filter(k => d[k] > 0).map(k => row(k, dollars(d[k]), COLOR[k])).join("") +
+                '<div class="tooltip-note">Total raised ' + dollars(d.total) + "</div>";
+            let at = 0;
+            SOURCES.forEach(function (k) {
+                const v = d[k];
                 if (v <= 0) return;
-                const w = Math.max(x(v) - (i > 0 ? 2 : 0), 1);
-                svg.append("rect").attr("x", x0 + at + (i > 0 && at > 0 ? 2 : 0)).attr("y", cy - barH / 2).attr("width", w).attr("height", barH)
-                    .attr("fill", fill).attr("stroke", i === 2 ? IK : null).attr("stroke-width", i === 2 ? 0.8 : null);
+                const gap = at > 0 ? 2 : 0;
+                svg.append("rect").attr("x", x0 + at + gap).attr("y", cy - barH / 2).attr("width", Math.max(x(v) - gap, 1)).attr("height", barH)
+                    .attr("fill", k === "Loans" ? loanFill : COLOR[k]).attr("stroke", k === "Loans" ? LOAN : null).attr("stroke-width", k === "Loans" ? 0.8 : null);
                 at += x(v);
             });
             svg.append("rect").attr("x", x0).attr("y", r.y).attr("width", plotW + valueW).attr("height", rowH).attr("fill", "transparent").call(hover, tip, width, height);
-            svg.append("text").attr("class", "value-label").attr("x", x0 + at + 5).attr("y", cy).attr("dy", "0.32em").text(money(d.cash + d.a1 + d.ik));
+            svg.append("text").attr("class", "value-label").attr("x", x0 + at + 5).attr("y", cy).attr("dy", "0.32em").text(money(d.total));
         });
     }
 
@@ -258,7 +258,7 @@
             const h = Math.ceil(document.documentElement.getBoundingClientRect().height);
             if (!h || (!force && Math.abs(h - last) < 2)) return;
             last = h;
-            window.parent.postMessage({ type: "iap-graphic-height", id: "cashOnHand", height: h }, "*");
+            window.parent.postMessage({ type: "iap-graphic-height", id: "totalRaised", height: h }, "*");
         }
         window.addEventListener("load", send);
         window.addEventListener("resize", send);

@@ -77,7 +77,7 @@
     <h1>Lorem ipsum dolor sit amet, consectetur adipiscing elit</h1>
     <p class="subtitle">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.</p>
 
-    <div id="chart-legend"><span class="legend-item"><span class="legend-swatch" style="background:#8A2C38;"></span>Common Ground</span><span class="legend-item"><span class="legend-swatch" style="background:#53646D;"></span>INCS Action</span><span class="legend-item"><span class="legend-swatch" style="background:#BE8A91;"></span>Urban Center</span><span class="legend-item"><span class="legend-swatch" style="background:#353B32;"></span>SEIU</span><span class="legend-item"><span class="legend-swatch" style="background:#C06621;"></span>CTU / Our Schools (in-kind help)</span><span class="legend-item"><span class="legend-swatch" style="background:#8A827F;"></span>Candidates' campaigns</span></div>
+    <div id="chart-legend"><span class="legend-item"><span class="legend-swatch" style="background:#8A2C38;"></span>Common Ground</span><span class="legend-item"><span class="legend-swatch" style="background:#53646D;"></span>INCS Action</span><span class="legend-item"><span class="legend-swatch" style="background:#BE8A91;"></span>Urban Center</span><span class="legend-item"><span class="legend-swatch" style="background:#353B32;"></span>SEIU</span><span class="legend-item"><span class="legend-swatch" style="background:#C06621;"></span>CTU / Our Schools (in-kind help)</span><span class="legend-item"><span class="legend-swatch" style="background:#8A827F;"></span>Candidates' campaigns</span><span class="legend-item"><span class="legend-swatch" style="background:#8A827F;background-image:repeating-linear-gradient(45deg, #8A827F 0 2px, transparent 2px 5px);background-color:transparent"></span>Candidates, not yet reported</span></div>
 
     <div id="chart-wrapper" style="position: relative;">
         <div id="chart-container">
@@ -177,38 +177,44 @@
     }
 
 
-    const SERIES = ["Common Ground", "INCS Action", "Candidates' campaigns", "CTU / Our Schools", "SEIU", "Urban Center"];
+    // bottom of the stack to top
+    const SERIES = ["Candidates' campaigns", "CTU / Our Schools", "SEIU", "Urban Center", "INCS Action", "Common Ground"];
     const SHORT = { "Candidates' campaigns": "Candidates", "CTU / Our Schools": "CTU" };
     const START = new Date("2026-01-01T12:00:00"), ELECTION = new Date("2026-11-03T12:00:00");
     const fmtDay = d3.timeFormat("%b. %-d, %Y");
-    let data = null;
+    const DAY = 864e5;
+    let data = null, candEnd = null, lastDate = null;
 
     d3.csv("spendingOverTime.csv").then(function (rows) {
-        // running totals; a blank cell means that spender's reports don't cover the date yet
-        const run = {}, ended = {};
+        // daily running totals; a blank cell means that spender hasn't reported that far yet
+        const run = {};
         SERIES.forEach(s => { run[s] = 0; });
-        const pts = rows.map(function (d) {
+        const daily = rows.map(function (d) {
             const p = { date: new Date(d.date + "T12:00:00") };
             SERIES.forEach(function (s) {
                 const v = num(d[s]);
-                if (v === null) { ended[s] = true; p[s] = null; return; }
+                if (v === null) { p[s] = run[s]; return; }
                 run[s] += v; p[s] = run[s];
+                if (s === "Candidates' campaigns") candEnd = p.date;
             });
             return p;
         });
-        // collapse everything before the window into one starting point
-        const before = pts.filter(p => p.date < START), after = pts.filter(p => p.date >= START);
-        const first = { date: START };
-        SERIES.forEach(s => { first[s] = before.length ? before[before.length - 1][s] : 0; });
-        data = [first].concat(after);
+        lastDate = daily[daily.length - 1].date;
+        // sample weekly so the curves are smooth, plus the last reported day
+        const at = function (t) {
+            let p = null;
+            for (const d of daily) { if (d.date <= t) p = d; else break; }
+            const o = { date: t };
+            SERIES.forEach(s => { o[s] = p ? p[s] : 0; });
+            return o;
+        };
+        const ticks = [];
+        for (let t = +START; t < +lastDate; t += 7 * DAY) ticks.push(new Date(t));
+        if (!ticks.some(x => +x === +lastDate)) ticks.push(lastDate);
+        data = ticks.sort((a, b) => a - b).map(at);
         render();
         window.addEventListener("resize", render);
     });
-
-    function lastOf(s) {
-        for (let i = data.length - 1; i >= 0; i--) if (data[i][s] !== null) return data[i];
-        return data[0];
-    }
 
     function render() {
         if (!data) return;
@@ -222,64 +228,80 @@
         const iw = width - margin.left - margin.right, ih = height - margin.top - margin.bottom;
         const g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
         const x = d3.scaleTime().domain([START, ELECTION]).range([0, iw]);
-        const maxV = d3.max(SERIES, s => lastOf(s)[s]);
-        const y = d3.scaleLinear().domain([0, maxV]).nice(4).range([ih, 0]);
+        const stack = d3.stack().keys(SERIES)(data);
+        const top = d3.max(stack[stack.length - 1], d => d[1]);
+        const y = d3.scaleLinear().domain([0, top]).nice(4).range([ih, 0]);
+        const defs = svg.append("defs");
 
         y.ticks(4).forEach(function (v) {
             if (v > 0) g.append("line").attr("class", "grid-line").attr("x1", 0).attr("x2", iw).attr("y1", y(v)).attr("y2", y(v));
             g.append("text").attr("class", "axis-label").attr("x", -6).attr("y", y(v)).attr("dy", "0.32em").attr("text-anchor", "end")
                 .text(v === 0 ? "$0" : "$" + d3.format(".0f")(v / 1e6) + "M");
         });
-        g.append("line").attr("class", "axis-line").attr("x1", 0).attr("x2", iw).attr("y1", ih).attr("y2", ih);
         const ticks = isMobile ? ["2026-01-01", "2026-05-01", "2026-09-01"] : ["2026-01-01", "2026-03-01", "2026-05-01", "2026-07-01", "2026-09-01"];
         ticks.forEach(function (t, i) {
             const dt = new Date(t + "T12:00:00");
             g.append("text").attr("class", "axis-label").attr("x", x(dt)).attr("y", ih + 16).attr("text-anchor", i === 0 ? "start" : "middle")
                 .text(d3.timeFormat(i === 0 ? "%b %Y" : "%b")(dt));
         });
-        g.append("line").attr("class", "marker-rule").attr("x1", x(ELECTION)).attr("x2", x(ELECTION)).attr("y1", 0).attr("y2", ih);
-        g.append("text").attr("class", "note-label halo").attr("x", x(ELECTION) - 5).attr("y", 8).attr("text-anchor", "end").text("Election Day");
 
-        // draw quieter series first so the big lines sit on top
-        SERIES.slice().reverse().forEach(function (s) {
-            const line = d3.line().defined(d => d[s] !== null).curve(d3.curveStepAfter).x(d => x(d.date)).y(d => y(d[s]));
-            const c = GROUP_COLOR[s];
-            g.append("path").datum(data).attr("fill", "none").attr("stroke", c).attr("stroke-width", 2)
-                .attr("stroke-linejoin", "round").attr("d", line);
-            const end = lastOf(s);
-            g.append("circle").attr("cx", x(end.date)).attr("cy", y(end[s])).attr("r", 3.5).attr("fill", c).attr("stroke", "#FFFFFF").attr("stroke-width", 1.5);
+        // monotone curves are smooth but never dip, so a running total never looks like it went down
+        const area = d3.area().curve(d3.curveMonotoneX).x(d => x(d.data.date)).y0(d => y(d[0])).y1(d => y(d[1]));
+        // candidates have reported only through Sept. 30: past that their layer is carried flat and hatched
+        defs.append("clipPath").attr("id", "cand-reported").append("rect").attr("x", -1).attr("y", -10).attr("width", x(candEnd) + 1).attr("height", ih + 20);
+        defs.append("clipPath").attr("id", "cand-unreported").append("rect").attr("x", x(candEnd)).attr("y", -10).attr("width", iw).attr("height", ih + 20);
+        const candHatch = hatch(defs, "cand-hatch", GROUP_COLOR["Candidates' campaigns"]);
+        stack.forEach(function (layer) {
+            const c = GROUP_COLOR[layer.key];
+            if (layer.key === "Candidates' campaigns") {
+                g.append("path").datum(layer).attr("d", area).attr("fill", c).attr("clip-path", "url(#cand-reported)");
+                g.append("path").datum(layer).attr("d", area).attr("fill", candHatch).attr("clip-path", "url(#cand-unreported)");
+            } else {
+                g.append("path").datum(layer).attr("d", area).attr("fill", c);
+            }
+            // thin surface-colored edge between layers
+            g.append("path").datum(layer).attr("d", d3.line().curve(d3.curveMonotoneX).x(d => x(d.data.date)).y(d => y(d[1])))
+                .attr("fill", "none").attr("stroke", "#FFFFFF").attr("stroke-width", 1);
         });
+        g.append("line").attr("class", "axis-line").attr("x1", 0).attr("x2", iw).attr("y1", ih).attr("y2", ih);
 
-        // end labels in a column at the right, nudged apart so they never collide
-        const CAND = "Candidates' campaigns";
-        const labels = SERIES.map(s => ({ s: s, end: lastOf(s), y: y(lastOf(s)[s]), h: s === CAND ? 44 : 31 })).sort((a, b) => a.y - b.y);
-        labels.forEach(function (l, i) { l.ly = i === 0 ? l.y : Math.max(l.y, labels[i - 1].ly + labels[i - 1].h); });
+        // markers: candidates' last report and Election Day
+        g.append("line").attr("class", "marker-rule").attr("x1", x(candEnd)).attr("x2", x(candEnd)).attr("y1", 0).attr("y2", ih);
+        g.append("text").attr("class", "note-label halo").attr("x", x(candEnd) - 5).attr("y", 8).attr("text-anchor", "end").text("Candidates' reports end Sept. 30");
+        g.append("line").attr("class", "marker-rule").attr("x1", x(ELECTION)).attr("x2", x(ELECTION)).attr("y1", 0).attr("y2", ih);
+        g.append("text").attr("class", "note-label halo").attr("x", x(ELECTION) - 5).attr("y", ih - 6).attr("text-anchor", "end").text("Election Day");
+
+        // end labels: each layer's total, at the middle of its band, nudged apart in a column
+        const endIdx = data.length - 1;
+        const labels = stack.map(l => ({ s: l.key, v: data[endIdx][l.key], y: y((l[endIdx][0] + l[endIdx][1]) / 2) })).sort((a, b) => a.y - b.y);
+        const gap = 31;
+        labels.forEach(function (l, i) { l.ly = i === 0 ? l.y : Math.max(l.y, labels[i - 1].ly + gap); });
         for (let i = labels.length - 1; i >= 0; i--) {
-            const lim = i === labels.length - 1 ? ih + 10 - (labels[i].h - 31) : labels[i + 1].ly - labels[i].h;
+            const lim = i === labels.length - 1 ? ih + 12 : labels[i + 1].ly - gap;
             labels[i].ly = Math.min(labels[i].ly, lim);
         }
-        const lx = iw + 8;
+        const ex = x(lastDate), lx = iw + 8;
         labels.forEach(function (l) {
-            const ex = x(l.end.date);
-            g.append("path").attr("d", "M" + (ex + 5) + "," + l.y + "L" + (lx - 3) + "," + l.ly).attr("fill", "none").attr("stroke", "#B9B0AB");
-            g.append("text").attr("class", "series-label").attr("x", lx).attr("y", l.ly - 3).attr("fill", INK).text(isMobile || l.s === CAND ? (SHORT[l.s] || l.s) : l.s);
-            g.append("text").attr("class", "value-label").attr("x", lx).attr("y", l.ly + 10).attr("font-weight", 400).attr("fill", "#574F54").text(money(l.end[l.s]));
-            if (l.s === CAND) g.append("text").attr("class", "name-label").attr("x", lx).attr("y", l.ly + 23).text("through Sept. 30");
+            g.append("path").attr("d", "M" + (ex + 2) + "," + l.y + "L" + (lx - 3) + "," + l.ly).attr("fill", "none").attr("stroke", "#B9B0AB");
+            g.append("text").attr("class", "series-label").attr("x", lx).attr("y", l.ly - 3).attr("fill", INK).text(isMobile ? (SHORT[l.s] || l.s) : l.s);
+            g.append("text").attr("class", "value-label").attr("x", lx).attr("y", l.ly + 10).attr("font-weight", 400).attr("fill", "#574F54")
+                .text(money(l.v) + (l.s === "Candidates' campaigns" && !isMobile ? " (Sept. 30)" : ""));
         });
 
         // crosshair + tooltip
         const rule = g.append("line").attr("class", "marker-rule").attr("y1", 0).attr("y2", ih).style("display", "none");
         const bis = d3.bisector(d => d.date).right;
-        g.append("rect").attr("width", iw).attr("height", ih).attr("fill", "transparent").classed("hit", true)
+        g.append("rect").attr("width", x(lastDate)).attr("height", ih).attr("fill", "transparent").classed("hit", true)
             .on("mouseenter mousemove", function (event) {
                 const [mx] = d3.pointer(event, this);
-                const dt = x.invert(mx);
-                const i = Math.max(0, bis(data, dt) - 1), d = data[i];
-                rule.style("display", null).attr("x1", mx).attr("x2", mx);
-                let html = '<div class="tooltip-header">Total spent by ' + fmtDay(dt > data[data.length - 1].date ? data[data.length - 1].date : dt) + "</div>";
-                SERIES.map(s => [s, d[s]]).sort((a, b) => (b[1] || 0) - (a[1] || 0)).forEach(function (p) {
-                    html += row(p[0], p[1] === null ? "not yet reported" : money(p[1]), GROUP_COLOR[p[0]]);
+                const d = data[Math.max(0, bis(data, x.invert(mx)) - 1)];
+                rule.style("display", null).attr("x1", x(d.date)).attr("x2", x(d.date));
+                let html = '<div class="tooltip-header">Total spent by ' + fmtDay(d.date) + "</div>";
+                SERIES.slice().reverse().forEach(function (s) {
+                    const note = s === "Candidates' campaigns" && d.date > candEnd ? " (through Sept. 30)" : "";
+                    html += row(s + note, money(d[s]), GROUP_COLOR[s]);
                 });
+                html += '<div class="tooltip-note">All spenders: ' + money(d3.sum(SERIES, s => d[s])) + "</div>";
                 tooltip.style("display", "block").html(html);
                 placeTooltip(event, width, height);
             })
