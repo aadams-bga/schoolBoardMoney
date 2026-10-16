@@ -7,6 +7,7 @@
 - [attackShare](https://aadams-bga.github.io/schoolBoardMoney/attackShare/)
 - [spendingOverTime](https://aadams-bga.github.io/schoolBoardMoney/spendingOverTime/)
 - [subdistrictMap](https://aadams-bga.github.io/schoolBoardMoney/subdistrictMap/) (add `#7A` or any subdistrict to the link to open with it selected)
+- [cashOnHand](https://aadams-bga.github.io/schoolBoardMoney/cashOnHand/)
 
 **Use this as the embed code**
 Change id and the slug portion of the src url
@@ -61,6 +62,7 @@ Heights are the rendered height at 640px wide; the script above resizes each one
 <iframe id="attackShare"         src="https://aadams-bga.github.io/schoolBoardMoney/attackShare/"         height="439" loading="lazy" scrolling="no" frameborder="0" style="display:block;width:100%;border:0;overflow:hidden"></iframe>
 <iframe id="spendingOverTime"    src="https://aadams-bga.github.io/schoolBoardMoney/spendingOverTime/"    height="650" loading="lazy" scrolling="no" frameborder="0" style="display:block;width:100%;border:0;overflow:hidden"></iframe>
 <iframe id="subdistrictMap"      src="https://aadams-bga.github.io/schoolBoardMoney/subdistrictMap/"      height="760" loading="lazy" scrolling="no" frameborder="0" style="display:block;width:100%;border:0;overflow:hidden"></iframe>
+<iframe id="cashOnHand"          src="https://aadams-bga.github.io/schoolBoardMoney/cashOnHand/"          height="1230" loading="lazy" scrolling="no" frameborder="0" style="display:block;width:100%;border:0;overflow:hidden"></iframe>
 ```
 
 **Where the data lives**
@@ -82,6 +84,7 @@ twoPlaybooks/                 <- independent spending vs. gifts to campaigns, by
 attackShare/                  <- supporting vs. opposing independent expenditures, by group
 spendingOverTime/             <- daily spending by spender; the page sums it into running totals
 subdistrictMap/               <- each group's money by subdistrict, candidate and kind; also loads subdistricts.geojson (boundaries + ballot)
+cashOnHand/                   <- subdistrict candidates: cash on latest D-2 + cash and in-kind A-1s dated after it
 
 dataDownload/
   candidates.csv              <- one row per candidate on the ballot: raised, spent, cash, outside money for/against

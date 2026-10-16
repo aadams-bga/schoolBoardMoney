@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Subdistrict candidates' cash on hand</title>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+    html, body { margin: 0; padding: 0; background-color: transparent; }
+    body { display: block; }
+    #chart-container-wrapper {
+        font-family: "Halyard Text", "halyard-text", "Inter", Arial, sans-serif;
+        max-width: 640px; width: 100%; min-width: 0; margin: 0 auto; position: relative; z-index: 1;
+        background-color: transparent; color: #1F161A; padding: 20px 20px 30px 20px; box-sizing: border-box;
+    }
+    #chart-container-wrapper h1 { font-size: 22px; font-weight: 700; margin: 0 0 8px 0; color: #1F161A; line-height: 1.25; letter-spacing: -0.01em; }
+    #chart-container-wrapper p.subtitle { font-size: 14px; color: #574F54; line-height: 1.45; margin: 0 0 14px 0; font-weight: 400; }
+    #chart-legend { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-bottom: 12px; font-size: 11.5px; color: #574F54; }
+    #chart-legend .legend-item { display: flex; align-items: center; gap: 6px; min-width: 0; }
+    #chart-legend .legend-rule { display: block; width: 22px; flex: 0 0 auto; background: #574F54; }
+    #chart-legend .legend-rule.dashed { height: 0; background: none; border-top: 1.5px dashed #574F54; }
+    #chart-legend .legend-rule.solid { height: 1.5px; }
+    #chart-legend .legend-swatch { display: block; width: 12px; height: 12px; flex: 0 0 auto; border: 1px solid rgba(31, 22, 26, 0.18); box-sizing: border-box; }
+    #chart-legend .legend-dot { display: block; width: 11px; height: 11px; border-radius: 50%; flex: 0 0 auto; }
+    #chart-legend svg.legend-mark { flex: 0 0 auto; }
+    #chart-container { position: relative; width: 100%; margin: 0 auto; z-index: 10; }
+    #chart-svg { display: block; width: 100%; height: auto; overflow: visible; }
+    .grid-line { stroke: #DCD4CE; stroke-width: 1px; }
+    .axis-label { font-size: 11px; fill: #6E656A; font-family: "Halyard Text", "halyard-text", "Inter", Arial, sans-serif; }
+    .axis-line { stroke: #B9B0AB; stroke-width: 1px; }
+    .series-label { font-family: "Halyard Text", "halyard-text", "Inter", Arial, sans-serif; font-size: 11.5px; font-weight: 700; line-height: 1.2; }
+    .value-label { font-family: "Halyard Text", "halyard-text", "Inter", Arial, sans-serif; font-size: 11.5px; font-weight: 600; fill: #1F161A; font-variant-numeric: tabular-nums; }
+    .row-label { font-family: "Halyard Text", "halyard-text", "Inter", Arial, sans-serif; font-size: 12.5px; font-weight: 700; fill: #1F161A; }
+    .name-label { font-family: "Halyard Text", "halyard-text", "Inter", Arial, sans-serif; font-size: 11px; fill: #574F54; }
+    .note-label { font-family: "Halyard Text", "halyard-text", "Inter", Arial, sans-serif; font-size: 11px; fill: #574F54; font-style: italic; }
+    .halo { paint-order: stroke; stroke: #FFFFFF; stroke-width: 3px; stroke-linejoin: round; }
+    .marker-rule { stroke: #1F161A; stroke-width: 1px; stroke-dasharray: 2 3; opacity: 0.65; }
+    .hit { cursor: pointer; }
+    #chart-tooltip {
+        position: absolute; pointer-events: none; display: none; background-color: #FFFFFF; border: 1px solid #B9B0AB;
+        box-shadow: 3px 3px 0 rgba(31, 22, 26, 0.12); padding: 8px 11px; font-size: 12px; color: #1F161A; z-index: 100; line-height: 1.45; max-width: 260px;
+    }
+    #chart-tooltip .tooltip-header { font-weight: 700; margin-bottom: 4px; }
+    #chart-tooltip .tooltip-row { display: flex; align-items: baseline; gap: 6px; white-space: nowrap; }
+    #chart-tooltip .tooltip-swatch { width: 8px; height: 8px; flex: 0 0 auto; }
+    #chart-tooltip .tooltip-name { color: #574F54; }
+    #chart-tooltip .tooltip-value { font-weight: 700; margin-left: auto; padding-left: 10px; }
+    #chart-tooltip .tooltip-note { color: #574F54; white-space: normal; }
+    .graph-footer { margin-top: 22px; padding-top: 12px; border-top: 1px solid #DCD4CE; font-size: 11px; color: #6E656A; line-height: 1.4; position: relative; z-index: 1; }
+    .graph-footer a { color: inherit; text-decoration: underline; }
+    .graph-footer .footer-note { margin-bottom: 5px; }
+    .iap-logo { position: absolute; bottom: 10px; right: 10px; width: 150px; opacity: 0.09; z-index: -99999; pointer-events: none; }
+    @media (max-width: 500px) {
+        #chart-container-wrapper { padding: 15px 15px 25px 15px; }
+        #chart-container-wrapper h1 { font-size: 18px; }
+        #chart-container-wrapper p.subtitle { font-size: 12.5px; margin-bottom: 12px; }
+        #chart-legend { font-size: 10.5px; gap: 4px 14px; }
+        .graph-footer { font-size: 10px; }
+        .iap-logo { width: 110px; }
+        .axis-label, .name-label, .note-label { font-size: 10px; }
+        .series-label, .value-label { font-size: 10.5px; }
+        .row-label { font-size: 11.5px; }
+    }
+
+</style>
+</head>
+<body>
+
+<div id="chart-container-wrapper">
+
+    <h1>Lorem ipsum dolor sit amet, consectetur adipiscing elit</h1>
+    <p class="subtitle">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+
+    <div id="chart-legend"><span class="legend-item"><span class="legend-swatch" style="background:#574F54;"></span>Cash on hand, Sept. 30</span><span class="legend-item"><span class="legend-swatch" style="background:#B9B0AB;"></span>Cash gifts and transfers since (A-1 reports)</span><span class="legend-item"><span class="legend-swatch" style="background:#8A827F;background-image:repeating-linear-gradient(45deg, #8A827F 0 2px, transparent 2px 5px);background-color:transparent"></span>In-kind help since (A-1 reports)</span><span class="legend-item">* Incumbent</span></div>
+
+    <div id="chart-wrapper" style="position: relative;">
+        <div id="chart-container">
+            <svg id="chart-svg"></svg>
+        </div>
+        <div id="chart-tooltip"></div>
+    </div>
+
+    <footer class="graph-footer">
+        <div class="footer-note">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cash on hand is ending funds on each candidate's latest D-2 quarterly report; A-1s are large-contribution reports dated after that report's period. Board president race not shown.</div>
+        Chart: Andrew Adams, Illinois Answers Project &middot; Source: Illinois Answers Project analysis of Illinois State Board of Elections records &middot; <a href="https://cdn.jsdelivr.net/gh/aadams-bga/schoolBoardMoney@main/cashOnHand/cashOnHand.csv" target="_blank" rel="noopener">Download the data</a>
+    </footer>
+    <img src="https://raw.githubusercontent.com/aadams-bga/images/bffe8cc967881aeed4fbdee8328f4b2e056159b9/iaplogo.svg" class="iap-logo" alt="Illinois Answers Project logo">
+</div>
+
+<script>
+(function () {
+
+    const MAROON = "#8A2C38";
+    const MAROON_LIGHT = "#BE8A91";
+    const STEEL = "#53646D";
+    const STEEL_LIGHT = "#A3AFB5";
+    const AMBER = "#C06621";
+    const SAGE = "#353B32";
+    const INK = "#1F161A";
+    const NEUTRAL = "#8A827F";
+    const GRAY_LIGHT = "#CBC4BE";
+    const FAINT = "#D8D2CC";
+
+    // one color per group, the same in every graphic in this package
+    const GROUP_COLOR = {
+        "Common Ground": MAROON, "INCS Action": STEEL, "Urban Center": MAROON_LIGHT, "SEIU": SAGE,
+        "CTU / Our Schools": AMBER, "Candidates' campaigns": NEUTRAL
+    };
+
+    const container = d3.select("#chart-container");
+    const svg = d3.select("#chart-svg");
+    const tooltip = d3.select("#chart-tooltip");
+    const wrapperNode = d3.select("#chart-wrapper").node();
+
+    function num(v) {
+        if (v == null) return null;
+        const s = String(v).trim();
+        if (s === "") return null;
+        const n = +s;
+        return Number.isFinite(n) ? n : null;
+    }
+
+    function esc(s) {
+        return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) {
+            return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c];
+        });
+    }
+
+    const dollars = d3.format("$,.0f");
+    function money(v) {
+        if (v >= 1e6) return "$" + (v / 1e6).toFixed(2) + "M";
+        if (v >= 1e3) return "$" + Math.round(v / 1e3) + "K";
+        return dollars(v);
+    }
+
+    function row(name, value, color) {
+        return '<div class="tooltip-row">' + (color ? '<span class="tooltip-swatch" style="background:' + color + '"></span>' : "") +
+            '<span class="tooltip-name">' + esc(name) + '</span><span class="tooltip-value">' + value + "</span></div>";
+    }
+
+    function placeTooltip(event, width, height) {
+        const node = tooltip.node();
+        const tw = node.offsetWidth;
+        const th = node.offsetHeight;
+        const [px, py] = d3.pointer(event, wrapperNode);
+        let left = px + 16;
+        if (left + tw > width - 4) left = px - tw - 16;
+        if (left < 4) left = 4;
+        let top = py - th / 2;
+        if (top < 4) top = 4;
+        if (top + th > height - 4) top = height - th - 4;
+        tooltip.style("left", left + "px").style("top", top + "px");
+    }
+
+    function hover(selection, html, width, height) {
+        selection.classed("hit", true)
+            .on("mouseenter mousemove", function (event, d) {
+                tooltip.style("display", "block").html(html(d));
+                placeTooltip(event, width, height);
+            })
+            .on("mouseleave", function () { tooltip.style("display", "none"); });
+    }
+
+    // diagonal hatch in a group's color, for spending after Sept. 30 / undisclosed money
+    function hatch(defs, id, color) {
+        const p = defs.append("pattern").attr("id", id).attr("width", 6).attr("height", 6)
+            .attr("patternUnits", "userSpaceOnUse").attr("patternTransform", "rotate(45)");
+        p.append("rect").attr("width", 6).attr("height", 6).attr("fill", color).attr("fill-opacity", 0.25);
+        p.append("line").attr("x1", 0).attr("y1", 0).attr("x2", 0).attr("y2", 6).attr("stroke", color).attr("stroke-width", 2.6);
+        return "url(#" + id + ")";
+    }
+
+
+    const CASH = "#574F54", A1 = "#B9B0AB", IK = "#8A827F";
+    const RACES = ["1A", "1B", "2A", "2B", "3A", "3B", "4A", "4B", "5A", "5B", "6A", "6B", "7A", "7B", "8A", "8B", "9A", "9B", "10A", "10B"];
+    const fmtEnd = d3.timeFormat("%b. %-d, %Y");
+    let data = null;
+
+    d3.csv("cashOnHand.csv", d => ({
+        race: d.race, candidate: d.candidate, incumbent: d.incumbent === "1", end: d.latest_d2_period_end ? new Date(d.latest_d2_period_end + "T12:00:00") : null,
+        cash: num(d.cash_on_hand), a1: num(d.a1_cash_since) || 0, ik: num(d.a1_inkind_since) || 0
+    })).then(function (rows) {
+        // within each subdistrict, the candidate with the most money first
+        data = rows.sort((a, b) => RACES.indexOf(a.race) - RACES.indexOf(b.race) || ((b.cash || 0) + b.a1 + b.ik) - ((a.cash || 0) + a.a1 + a.ik));
+        render();
+        window.addEventListener("resize", render);
+    });
+
+    function render() {
+        if (!data) return;
+        svg.selectAll("*").remove();
+        const width = container.node().getBoundingClientRect().width;
+        if (!width) return;
+        const isMobile = width < 500;
+        const raceW = isMobile ? 28 : 38, nameW = isMobile ? 132 : 172, valueW = isMobile ? 50 : 58;
+        const barH = 13, rowH = 20, raceGap = 9, top = 4;
+        let y = top, last = null;
+        const rows = data.map(function (d) {
+            if (last !== null && d.race !== last) y += raceGap;
+            const r = { d: d, y: y, first: d.race !== last };
+            last = d.race; y += rowH;
+            return r;
+        });
+        const height = y + 4;
+        svg.attr("width", width).attr("height", height).attr("viewBox", "0 0 " + width + " " + height).attr("preserveAspectRatio", "xMinYMin meet");
+        const x0 = raceW + nameW, plotW = width - x0 - valueW;
+        const max = d3.max(data, d => (d.cash || 0) + d.a1 + d.ik);
+        const x = d3.scaleLinear().domain([0, max]).range([0, plotW]);
+        const defs = svg.append("defs");
+        const ikFill = hatch(defs, "ik-hatch", IK);
+
+        // light vertical gridlines
+        x.ticks(isMobile ? 3 : 4).forEach(function (v) {
+            svg.append("line").attr("class", "grid-line").attr("x1", x0 + x(v)).attr("x2", x0 + x(v)).attr("y1", 0).attr("y2", height);
+        });
+
+        rows.forEach(function (r) {
+            const d = r.d, cy = r.y + rowH / 2;
+            if (r.first) {
+                svg.append("text").attr("class", "row-label").attr("x", 0).attr("y", cy).attr("dy", "0.32em").text(d.race);
+                if (r.y > top) svg.append("line").attr("x1", 0).attr("x2", width).attr("y1", r.y - raceGap / 2).attr("y2", r.y - raceGap / 2).attr("stroke", "#EEE9E4");
+            }
+            // on phones, drop nicknames and middle initials so names fit beside the bars
+            const name = (isMobile ? d.candidate.replace(/ "[^"]*"/, "").replace(/ [A-Z]\.(?= )/g, "") : d.candidate) + (d.incumbent ? " *" : "");
+            svg.append("text").attr("class", "name-label").attr("x", raceW).attr("y", cy).attr("dy", "0.32em").attr("fill", INK).text(name);
+            if (d.cash === null) {
+                svg.append("text").attr("class", "note-label").attr("x", x0).attr("y", cy).attr("dy", "0.32em").text("No report filed");
+                return;
+            }
+            const segs = [["Cash on hand", d.cash, CASH], ["Cash gifts and transfers since (A-1s)", d.a1, A1], ["In-kind help since (A-1s)", d.ik, ikFill]];
+            let at = 0;
+            const tip = () => '<div class="tooltip-header">' + esc(d.candidate) + " (" + esc(d.race) + ")</div>" +
+                row("Cash on hand, " + fmtEnd(d.end), dollars(d.cash), CASH) + row("Cash gifts and transfers since", dollars(d.a1), A1) +
+                row("In-kind help since", dollars(d.ik), IK) + '<div class="tooltip-note">Total ' + dollars(d.cash + d.a1 + d.ik) + "</div>";
+            segs.forEach(function ([label, v, fill], i) {
+                if (v <= 0) return;
+                const w = Math.max(x(v) - (i > 0 ? 2 : 0), 1);
+                svg.append("rect").attr("x", x0 + at + (i > 0 && at > 0 ? 2 : 0)).attr("y", cy - barH / 2).attr("width", w).attr("height", barH)
+                    .attr("fill", fill).attr("stroke", i === 2 ? IK : null).attr("stroke-width", i === 2 ? 0.8 : null);
+                at += x(v);
+            });
+            svg.append("rect").attr("x", x0).attr("y", r.y).attr("width", plotW + valueW).attr("height", rowH).attr("fill", "transparent").call(hover, tip, width, height);
+            svg.append("text").attr("class", "value-label").attr("x", x0 + at + 5).attr("y", cy).attr("dy", "0.32em").text(money(d.cash + d.a1 + d.ik));
+        });
+    }
+
+
+    (function () {
+        if (window.parent === window) return;
+        let last = 0;
+        function send(force) {
+            const h = Math.ceil(document.documentElement.getBoundingClientRect().height);
+            if (!h || (!force && Math.abs(h - last) < 2)) return;
+            last = h;
+            window.parent.postMessage({ type: "iap-graphic-height", id: "cashOnHand", height: h }, "*");
+        }
+        window.addEventListener("load", send);
+        window.addEventListener("resize", send);
+        if (window.ResizeObserver) new ResizeObserver(send).observe(document.body);
+        setTimeout(send, 300);
+        setTimeout(send, 1200);
+        window.addEventListener("message", function (e) {
+            if (e.data && e.data.type === "iap-graphic-request") send(true);
+        });
+    })();
+
+})();
+</script>
+</body>
+</html>

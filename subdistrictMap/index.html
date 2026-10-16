@@ -95,6 +95,7 @@
     .color-by button[aria-pressed="true"] { background: #1F161A; color: #FFFFFF; border-color: #1F161A; }
     .ramp { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #574F54; }
     .ramp .grad { width: 140px; height: 9px; border: 1px solid rgba(31, 22, 26, 0.18); }
+    .ramp .zero-swatch { width: 12px; height: 9px; border: 1px solid rgba(31, 22, 26, 0.18); }
     .district { stroke: #FFFFFF; stroke-width: 1px; cursor: pointer; }
     .district:focus { outline: none; }
     .district.active { stroke: #1F161A; stroke-width: 2px; }
@@ -269,12 +270,17 @@
 
         const vals = new Map(features.map(f => [f.properties.race, amountFor(f.properties.race, mode)]));
         const max = d3.max(vals.values()) || 1;
-        const color = d3.scaleLinear().domain([0, max]).range(["#F3EEE9", RAMP_END[mode]]).interpolate(d3.interpolateLab);
+        // square-root scale, and any money at all starts at a visible tint, so a $5,000 district never reads as empty
+        const lo = d3.interpolateLab("#F3EEE9", RAMP_END[mode])(0.18);
+        const color = d3.scaleSqrt().domain([0, max]).range([lo, RAMP_END[mode]]).interpolate(d3.interpolateLab);
         const fill = v => v > 0 ? color(v) : ZERO;
 
         const ramp = d3.select("#chart-legend .ramp").html("");
-        ramp.append("span").text("$0");
-        ramp.append("span").attr("class", "grad").style("background", "linear-gradient(to right, #F3EEE9, " + RAMP_END[mode] + ")");
+        ramp.append("span").attr("class", "zero-swatch").style("background", ZERO);
+        ramp.append("span").text("No money");
+        ramp.append("span").style("width", "8px");
+        ramp.append("span").text("$1");
+        ramp.append("span").attr("class", "grad").style("background", "linear-gradient(to right, " + d3.range(0, 1.01, 0.1).map(t => color(t * t * max)).join(", ") + ")");
         ramp.append("span").text(money(max));
 
         // clicking empty space around the map, or pressing Escape, goes back to all of Chicago
