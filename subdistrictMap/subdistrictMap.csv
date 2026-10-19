@@ -1,20 +1,27 @@
 race,candidate,group,kind,amount
+10A,"Che ""Rhymefest"" Smith",Campaign,Own spending,80924
 10A,"Che ""Rhymefest"" Smith",INCS Action,Ads supporting,78598
 10A,"Che ""Rhymefest"" Smith",INCS Action,Gifts and in-kind,5000
 10A,"Che ""Rhymefest"" Smith",SEIU,Gifts and in-kind,20000
 10B,Connie Anderson,CTU / Our Schools,Gifts and in-kind,46123
+10B,Connie Anderson,Campaign,Own spending,2528
 10B,Connie Anderson,Common Ground,Ads opposing,50156
+10B,Patrick C. Watson,Campaign,Own spending,2298
 10B,Patrick C. Watson,Common Ground,Ads supporting,68293
 10B,Patrick C. Watson,INCS Action,Ads supporting,116626
 10B,Patrick C. Watson,Urban Center,Ads supporting,10658
 1A,Ed Bannon,CTU / Our Schools,Gifts and in-kind,15473
+1A,Ed Bannon,Campaign,Own spending,5645
+1A,Margie B. Luczak,Campaign,Own spending,12014
 1A,Margie B. Luczak,INCS Action,Ads supporting,117760
 1A,Margie B. Luczak,INCS Action,Gifts and in-kind,10043
 1A,Margie B. Luczak,Urban Center,Ads supporting,20704
 1A,Margie B. Luczak,Urban Center,Gifts and in-kind,3000
 1B,Claudia Peralta,CTU / Our Schools,Gifts and in-kind,42988
+1B,Claudia Peralta,Campaign,Own spending,40935
 1B,Claudia Peralta,Common Ground,Ads opposing,139690
 1B,Claudia Peralta,SEIU,Gifts and in-kind,10000
+1B,Michelle N. Pierre,Campaign,Own spending,19277
 1B,Michelle N. Pierre,Common Ground,Ads supporting,115760
 1B,Michelle N. Pierre,Common Ground,Gifts and in-kind,1707
 1B,Michelle N. Pierre,INCS Action,Ads supporting,136754
@@ -22,17 +29,24 @@ race,candidate,group,kind,amount
 1B,Michelle N. Pierre,Urban Center,Ads supporting,10968
 1B,Michelle N. Pierre,Urban Center,Gifts and in-kind,2000
 2A,Ebony DeBerry,CTU / Our Schools,Gifts and in-kind,705
+2A,Ebony DeBerry,Campaign,Own spending,3423
+2A,Hector Morales,Campaign,Own spending,195
 2A,Hector Morales,INCS Action,Gifts and in-kind,1008
 2A,Hector Morales,Urban Center,Gifts and in-kind,1000
+2B,Daniel Basco,Campaign,Own spending,1834
 2B,"Deborah ""Debby"" Pope",CTU / Our Schools,Gifts and in-kind,34012
+2B,"Deborah ""Debby"" Pope",Campaign,Own spending,4129
 2B,"Deborah ""Debby"" Pope",Common Ground,Ads opposing,40156
+2B,Kyna Lenhof,Campaign,Own spending,5783
 2B,Kyna Lenhof,Common Ground,Ads supporting,73293
 2B,Kyna Lenhof,Common Ground,Gifts and in-kind,3860
 2B,Kyna Lenhof,INCS Action,Ads supporting,121544
 2B,Kyna Lenhof,INCS Action,Gifts and in-kind,11860
 3A,Norma Rios Sierra,CTU / Our Schools,Gifts and in-kind,23982
+3A,Norma Rios Sierra,Campaign,Own spending,19618
 3A,Norma Rios Sierra,Common Ground,Ads opposing,135540
 3A,Norma Rios Sierra,SEIU,Gifts and in-kind,10000
+3A,Peter Gonzales,Campaign,Own spending,23489
 3A,Peter Gonzales,Common Ground,Ads supporting,76335
 3A,Peter Gonzales,Common Ground,Gifts and in-kind,1277
 3A,Peter Gonzales,INCS Action,Ads supporting,107080
@@ -40,6 +54,7 @@ race,candidate,group,kind,amount
 3A,Peter Gonzales,SEIU,Gifts and in-kind,7500
 3A,Peter Gonzales,Urban Center,Ads supporting,9647
 3A,Peter Gonzales,Urban Center,Gifts and in-kind,625
+3B,Carlos A. Rivas Jr.,Campaign,Own spending,62461
 3B,Carlos A. Rivas Jr.,Common Ground,Ads supporting,102100
 3B,Carlos A. Rivas Jr.,Common Ground,Gifts and in-kind,1552
 3B,Carlos A. Rivas Jr.,INCS Action,Ads supporting,129740
@@ -49,7 +64,9 @@ race,candidate,group,kind,amount
 3B,Carlos A. Rivas Jr.,Urban Center,Ads supporting,8370
 3B,Carlos A. Rivas Jr.,Urban Center,Gifts and in-kind,4283
 3B,Jason Dónes,CTU / Our Schools,Gifts and in-kind,34861
+3B,Jason Dónes,Campaign,Own spending,15928
 3B,Jason Dónes,Common Ground,Ads opposing,78050
+4A,Ellen Sherratt,Campaign,Own spending,88115
 4A,Ellen Sherratt,Common Ground,Ads supporting,160500
 4A,Ellen Sherratt,Common Ground,Gifts and in-kind,1785
 4A,Ellen Sherratt,INCS Action,Ads supporting,68656
@@ -59,19 +76,24 @@ race,candidate,group,kind,amount
 4A,Ellen Sherratt,Urban Center,Ads supporting,13367
 4A,Ellen Sherratt,Urban Center,Gifts and in-kind,970
 4A,Karen Zaccor,CTU / Our Schools,Gifts and in-kind,62749
+4A,Karen Zaccor,Campaign,Own spending,16484
 4A,Karen Zaccor,Common Ground,Ads opposing,42000
 4A,Karen Zaccor,INCS Action,Ads opposing,89328
+4B,Ellen Rosenfeld,Campaign,Own spending,76661
 4B,Ellen Rosenfeld,Common Ground,Gifts and in-kind,1396
 4B,Ellen Rosenfeld,INCS Action,Gifts and in-kind,5000
 4B,Ellen Rosenfeld,SEIU,Gifts and in-kind,5000
 5A,"Aaron ""Jitu"" Brown",CTU / Our Schools,Gifts and in-kind,53483
+5A,"Aaron ""Jitu"" Brown",Campaign,Own spending,4129
 5A,"Aaron ""Jitu"" Brown",Common Ground,Ads opposing,59000
+5A,LaPamela Williams,Campaign,Own spending,16999
 5A,LaPamela Williams,Common Ground,Ads supporting,118000
 5A,LaPamela Williams,Common Ground,Gifts and in-kind,3136
 5A,LaPamela Williams,INCS Action,Ads supporting,105298
 5A,LaPamela Williams,INCS Action,Gifts and in-kind,9454
 5A,LaPamela Williams,Urban Center,Ads supporting,9249
 5A,LaPamela Williams,Urban Center,Gifts and in-kind,3125
+5B,Anthony Hargrove,Campaign,Own spending,18407
 5B,Anthony Hargrove,Common Ground,Ads supporting,76335
 5B,Anthony Hargrove,Common Ground,Gifts and in-kind,1432
 5B,Anthony Hargrove,INCS Action,Ads supporting,110298
@@ -79,21 +101,28 @@ race,candidate,group,kind,amount
 5B,Anthony Hargrove,Urban Center,Ads supporting,9601
 5B,Anthony Hargrove,Urban Center,Gifts and in-kind,2312
 5B,"Michilla ""Kyla"" Blaise",CTU / Our Schools,Gifts and in-kind,55353
+5B,"Michilla ""Kyla"" Blaise",Campaign,Own spending,14065
 5B,"Michilla ""Kyla"" Blaise",Common Ground,Ads opposing,135540
 6A,Anusha Thotakura,CTU / Our Schools,Gifts and in-kind,52504
+6A,Anusha Thotakura,Campaign,Own spending,7121
 6A,Anusha Thotakura,Common Ground,Ads opposing,80500
 6A,Brenda Lee Anderson,CTU / Our Schools,Gifts and in-kind,1372
+6A,Brenda Lee Anderson,Campaign,Own spending,7213
+6A,Isaiah White,Campaign,Own spending,58795
 6A,Isaiah White,Common Ground,Ads supporting,171500
 6A,Isaiah White,Common Ground,Gifts and in-kind,2018
 6A,Isaiah White,INCS Action,Ads supporting,119254
 6A,Isaiah White,INCS Action,Gifts and in-kind,9835
 6A,Isaiah White,Urban Center,Ads supporting,17990
 6A,Isaiah White,Urban Center,Gifts and in-kind,5283
+6B,Brittany B. Kimble,Campaign,Own spending,7719
 6B,Brittany B. Kimble,INCS Action,Gifts and in-kind,3000
 6B,Brittany B. Kimble,Urban Center,Gifts and in-kind,16209
 6B,Michael L. Neal,INCS Action,Gifts and in-kind,3000
 7A,Emma Lozano,CTU / Our Schools,Gifts and in-kind,15136
+7A,Emma Lozano,Campaign,Own spending,3261
 7A,Emma Lozano,Common Ground,Ads opposing,125540
+7A,Jesus Ayala Jr.,Campaign,Own spending,9827
 7A,Jesus Ayala Jr.,Common Ground,Ads supporting,76335
 7A,Jesus Ayala Jr.,Common Ground,Gifts and in-kind,9145
 7A,Jesus Ayala Jr.,INCS Action,Ads supporting,92222
@@ -102,20 +131,27 @@ race,candidate,group,kind,amount
 7A,Jesus Ayala Jr.,SEIU,Gifts and in-kind,25000
 7A,Jesus Ayala Jr.,Urban Center,Ads supporting,10121
 7A,Jesus Ayala Jr.,Urban Center,Gifts and in-kind,2496
+7B,Erika E. Diaz-Chavez,Campaign,Own spending,1630
 7B,Erika E. Diaz-Chavez,INCS Action,Ads supporting,89178
 7B,Erika E. Diaz-Chavez,INCS Action,Gifts and in-kind,10453
 7B,Erika E. Diaz-Chavez,Urban Center,Ads supporting,17092
 7B,Erika E. Diaz-Chavez,Urban Center,Gifts and in-kind,4890
 7B,Yesenia Lopez,CTU / Our Schools,Gifts and in-kind,1000
+7B,Yesenia Lopez,Campaign,Own spending,1544
 7B,Yesenia Lopez,SEIU,Ads supporting,53267
 7B,Yesenia Lopez,SEIU,Gifts and in-kind,25000
+8A,Angel Gutierrez,Campaign,Own spending,15358
 8A,Angel Gutierrez,Common Ground,Gifts and in-kind,167
 8A,Angel Gutierrez,INCS Action,Gifts and in-kind,5000
 8A,Angel Gutierrez,SEIU,Gifts and in-kind,5000
+8B,Juan Ignacio Gonzalez,Campaign,Own spending,15400
 8B,Juan Ignacio Gonzalez,Common Ground,Gifts and in-kind,1776
 8B,Juan Ignacio Gonzalez,INCS Action,Gifts and in-kind,8344
 8B,Juan Ignacio Gonzalez,Urban Center,Gifts and in-kind,6420
+9A,Brittany R. Bailey Preston,Campaign,No report filed,0
 9B,Katherine S. Dunneback,CTU / Our Schools,Gifts and in-kind,46823
+9B,Katherine S. Dunneback,Campaign,Own spending,5976
+9B,Therese Boyle,Campaign,Own spending,35402
 9B,Therese Boyle,Common Ground,Gifts and in-kind,4423
 9B,Therese Boyle,INCS Action,Ads supporting,147271
 9B,Therese Boyle,INCS Action,Gifts and in-kind,1000

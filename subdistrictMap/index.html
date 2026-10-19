@@ -85,6 +85,8 @@
     #map-panel .stack .lbl { flex: 0 0 auto; font-size: 10.5px; color: #574F54; font-variant-numeric: tabular-nums; min-width: 72px; text-align: right; }
     #map-panel .panel-total { border-top: 1px solid #DCD4CE; padding-top: 6px; margin-top: 4px; display: flex; font-weight: 700; }
     #map-panel .panel-total .amt { margin-left: auto; }
+    #map-panel .panel-total.own { border-top: 0; padding-top: 2px; margin-top: 0; font-weight: 400; color: #574F54; }
+    #map-panel .stack .lbl.own-none { min-width: 0; text-align: left; font-style: italic; color: #9A9195; }
     #map-panel .hint { color: #6E656A; font-size: 11px; margin-top: 8px; font-style: italic; }
     #chart-legend { flex-direction: column; align-items: flex-start; gap: 8px; }
     .color-by { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
@@ -109,8 +111,8 @@
 
 <div id="chart-container-wrapper">
 
-    <h1>Lorem ipsum dolor sit amet, consectetur adipiscing elit</h1>
-    <p class="subtitle">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.</p>
+    <h1>See a breakdown of who&rsquo;s spending to win in Chicago Board of Education districts</h1>
+    <p class="subtitle">Millions of dollars are being spent in key battlegrounds for seats on Chicago&rsquo;s first fully elected school board. See where special interest groups are spending by clicking or using your mouse on the map below.</p>
 
     <div id="chart-legend"></div>
 
@@ -122,8 +124,8 @@
     </div>
 
     <footer class="graph-footer">
-        <div class="footer-note">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Board president race not shown. Boundaries: &ldquo;School Board District&rdquo; layer on ArcGIS Online, not an official Chicago Board of Elections file.</div>
-        Chart: Andrew Adams, Illinois Answers Project &middot; Source: Illinois Answers Project analysis of Illinois State Board of Elections records &middot; <a href="https://cdn.jsdelivr.net/gh/aadams-bga/schoolBoardMoney@main/subdistrictMap/subdistrictMap.csv" target="_blank" rel="noopener">Download the data</a>
+        
+        Chart: Andrew Adams, Illinois Answers Project &middot; Source: Illinois Answers Project and Chalkbeat analysis of Illinois State Board of Elections records &middot; <a href="https://cdn.jsdelivr.net/gh/aadams-bga/schoolBoardMoney@main/subdistrictMap/subdistrictMap.csv" target="_blank" rel="noopener">Download the data</a>
     </footer>
 </div>
 
@@ -212,8 +214,11 @@
 
 
     const GROUPS = ["Common Ground", "INCS Action", "Urban Center", "CTU / Our Schools", "SEIU"];
-    const MODES = [["Total", "All five groups"]].concat(GROUPS.map(g => [g, g]));
-    const RAMP_END = Object.assign({ "Total": INK }, GROUP_COLOR);
+    const CAMP = "Campaign", CAMP_COLOR = "#8A827F";   // each candidate's own spending, shown beside the groups' money, never summed with it
+    const MODES = [["Total", "All five groups"]].concat(GROUPS.map(g => [g, g]), [[CAMP, "Candidates' own spending"]]);
+    const RAMP_END = Object.assign({ "Total": INK, [CAMP]: CAMP_COLOR }, GROUP_COLOR);
+    const COLOR = Object.assign({ [CAMP]: CAMP_COLOR }, GROUP_COLOR);
+    const isGroup = l => l.group !== CAMP;
     const ZERO = "#EEE9E4";
     let features = null, lines = null, mode = "Total", pinned = null, hovered = null;
 
@@ -237,7 +242,7 @@
         });
 
     function amountFor(race, m) {
-        return d3.sum(lines, l => l.race === race && (m === "Total" || l.group === m) ? l.amount : 0);
+        return d3.sum(lines, l => l.race === race && (m === "Total" ? isGroup(l) : l.group === m) ? l.amount : 0);
     }
 
     function buildControls() {
@@ -315,8 +320,8 @@
     function stack(parts, scale, against, total) {
         if (!total) return "";
         return "<div class='stack'><div class='track'>" + parts.filter(p => p.v > 0).map(p =>
-            "<span data-tip='" + esc(JSON.stringify(p.tip)).replace(/'/g, "&#39;") + "' style='width:" + (100 * p.v / scale) + "%;background:" + (against ? STRIPE(GROUP_COLOR[p.g]) : GROUP_COLOR[p.g]) + "'></span>").join("") +
-            "</div><span class='lbl'>" + (against ? "against " : "") + money(total) + "</span></div>";
+            "<span data-tip='" + esc(JSON.stringify(p.tip)).replace(/'/g, "&#39;") + "' style='width:" + (100 * p.v / scale) + "%;background:" + (against === true ? STRIPE(COLOR[p.g]) : COLOR[p.g]) + "'></span>").join("") +
+            "</div><span class='lbl'>" + (against === "own" ? "own " : against ? "against " : "") + money(total) + "</span></div>";
     }
 
     function candidateRows(rows, cands, showRace) {
@@ -328,18 +333,25 @@
                 return { g: g, v: d3.sum(ls, l => l.amount), tip: { g: g, c: c.name, rows: ls.map(l => [l.kind, l.amount]) } };
             };
             const forP = GROUPS.map(g => part(g, false)), agP = GROUPS.map(g => part(g, true));
-            return { c: c, forP: forP, agP: agP, forT: d3.sum(forP, p => p.v), agT: d3.sum(agP, p => p.v) };
+            const own = mine.filter(l => l.group === CAMP);
+            const ownT = d3.sum(own, l => l.amount);
+            const ownP = [{ g: CAMP, v: ownT, tip: { g: "Campaign's own spending", c: "", rows: [["Through Sept. 30", ownT]] } }];
+            return { c: c, forP: forP, agP: agP, forT: d3.sum(forP, p => p.v), agT: d3.sum(agP, p => p.v),
+                     ownP: ownP, ownT: ownT, noReport: own.some(l => l.kind === "No report filed") };
         });
-        const scale = d3.max(data, d => Math.max(d.forT, d.agT)) || 1;
+        const scale = d3.max(data, d => Math.max(d.forT, d.agT, d.ownT)) || 1;
         return data.map(d => "<div class='cand'><div class='cand-name" + (d.forT + d.agT ? "" : " none") + "'>" +
             (showRace ? "<span class='race'>" + esc(d.c.race) + "</span>" : "") + esc(d.c.name) + (d.c.incumbent ? " (inc.)" : "") +
-            (d.forT + d.agT ? "" : "<span class='amt'>$0</span>") + "</div>" +
-            stack(d.forP, scale, false, d.forT) + stack(d.agP, scale, true, d.agT) + "</div>").join("");
+            "</div>" +
+            stack(d.forP, scale, false, d.forT) + stack(d.agP, scale, true, d.agT) +
+            (d.noReport ? "<div class='stack'><span class='lbl own-none'>Campaign: no report filed</span></div>"
+                        : d.ownT ? stack(d.ownP, scale, "own", d.ownT) : "<div class='stack'><span class='lbl own-none'>Campaign spent $0</span></div>") + "</div>").join("");
     }
 
     function showPanel(race) {
         const panel = d3.select("#map-panel");
-        const rows = race ? lines.filter(l => l.race === race) : lines;
+        const all = race ? lines.filter(l => l.race === race) : lines;
+        const rows = all.filter(isGroup);
         let html = "";
         if (race) {
             html += "<button type='button' class='reset'>&larr; All of Chicago</button>";
@@ -348,18 +360,20 @@
             html += "<h2>All 20 subdistricts</h2>";
         }
         html += "<div class='key'>" + GROUPS.map(g => "<span><i style='background:" + GROUP_COLOR[g] + "'></i>" + esc(g) + "</span>").join("") +
-            "<span><i style='background:" + STRIPE("#574F54") + "'></i>Ads against</span></div>";
+            "<span><i style='background:" + STRIPE("#574F54") + "'></i>Ads against</span>" +
+            "<span><i style='background:" + CAMP_COLOR + "'></i>Campaign's own spending (through Sept. 30)</span></div>";
         if (race) {
             const f = features.find(x => x.properties.race === race);
-            html += candidateRows(rows, f.properties.candidates.map(c => ({ name: c.name, incumbent: c.incumbent, race: race })), false);
+            html += candidateRows(all, f.properties.candidates.map(c => ({ name: c.name, incumbent: c.incumbent, race: race })), false);
         } else {
             // citywide: the candidates with the most outside money for or against them
             const all = features.flatMap(f => f.properties.candidates.map(c => ({ name: c.name, incumbent: c.incumbent, race: f.properties.race })));
-            const tot = c => d3.sum(lines, l => l.candidate === c.name && l.race === c.race ? l.amount : 0);
+            const tot = c => d3.sum(lines, l => isGroup(l) && l.candidate === c.name && l.race === c.race ? l.amount : 0);
             html += "<div class='hint' style='margin:0 0 8px 0'>Top 8 candidates by outside money</div>";
             html += candidateRows(lines, all.sort((a, b) => tot(b) - tot(a)).slice(0, 8), true);
         }
-        html += "<div class='panel-total'>Total<span class='amt'>" + dollars(d3.sum(rows, l => l.amount)) + "</span></div>";
+        html += "<div class='panel-total'>Five groups<span class='amt'>" + dollars(d3.sum(rows, l => l.amount)) + "</span></div>";
+        html += "<div class='panel-total own'>Campaigns' own spending<span class='amt'>" + dollars(d3.sum(all, l => isGroup(l) ? 0 : l.amount)) + "</span></div>";
         html += "<div class='hint'>" + (race ? (pinned ? "Click again or press Esc to return to all of Chicago." : "Click to keep this subdistrict selected.") : "Hover over or tap a subdistrict for details.") + "</div>";
         panel.html(html);
         panel.select(".reset").on("click", clearSelection);
@@ -367,7 +381,7 @@
         const height = d3.select("#chart-wrapper").node().getBoundingClientRect().height;
         panel.selectAll(".track span").each(function () {
             const t = JSON.parse(this.getAttribute("data-tip"));
-            d3.select(this).datum(t).call(hover, d => '<div class="tooltip-header">' + esc(d.g) + "</div>" + d.rows.map(r => row(r[0] + " " + d.c, dollars(r[1]))).join(""), width, height);
+            d3.select(this).datum(t).call(hover, d => '<div class="tooltip-header">' + esc(d.g) + "</div>" + d.rows.map(r => row(r[0] + (d.c ? " " + d.c : ""), dollars(r[1]))).join(""), width, height);
         });
     }
 
