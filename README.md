@@ -2,8 +2,7 @@
 - [headToHead](https://aadams-bga.github.io/schoolBoardMoney/headToHead/)
 - [attackShare](https://aadams-bga.github.io/schoolBoardMoney/attackShare/)
 - [spendingOverTime](https://aadams-bga.github.io/schoolBoardMoney/spendingOverTime/)
-- [subdistrictMap](https://aadams-bga.github.io/schoolBoardMoney/subdistrictMap/) (add `#7A` or any subdistrict to the link to open with it selected)
-- [totalRaised](https://aadams-bga.github.io/schoolBoardMoney/totalRaised/)
+- [districtMap](https://aadams-bga.github.io/schoolBoardMoney/districtMap/) (add `#7A` or any subdistrict to the link to open with it selected)
 
 **Use this as the embed code**
 Change id and the slug portion of the src url
@@ -53,6 +52,5 @@ Heights are the rendered height at 640px wide; the script above resizes each one
 <iframe id="headToHead"          src="https://aadams-bga.github.io/schoolBoardMoney/headToHead/"          height="870" loading="lazy" scrolling="no" frameborder="0" style="display:block;width:100%;border:0;overflow:hidden"></iframe>
 <iframe id="attackShare"         src="https://aadams-bga.github.io/schoolBoardMoney/attackShare/"         height="439" loading="lazy" scrolling="no" frameborder="0" style="display:block;width:100%;border:0;overflow:hidden"></iframe>
 <iframe id="spendingOverTime"    src="https://aadams-bga.github.io/schoolBoardMoney/spendingOverTime/"    height="650" loading="lazy" scrolling="no" frameborder="0" style="display:block;width:100%;border:0;overflow:hidden"></iframe>
-<iframe id="subdistrictMap"      src="https://aadams-bga.github.io/schoolBoardMoney/subdistrictMap/"      height="760" loading="lazy" scrolling="no" frameborder="0" style="display:block;width:100%;border:0;overflow:hidden"></iframe>
-<iframe id="totalRaised"         src="https://aadams-bga.github.io/schoolBoardMoney/totalRaised/"         height="1230" loading="lazy" scrolling="no" frameborder="0" style="display:block;width:100%;border:0;overflow:hidden"></iframe>
+<iframe id="districtMap"         src="https://aadams-bga.github.io/schoolBoardMoney/districtMap/"         height="760" loading="lazy" scrolling="no" frameborder="0" style="display:block;width:100%;border:0;overflow:hidden"></iframe>
 ```

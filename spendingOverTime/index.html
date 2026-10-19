@@ -219,7 +219,7 @@
         const width = container.node().getBoundingClientRect().width;
         if (!width) return;
         const isMobile = width < 500;
-        const margin = { top: 10, right: isMobile ? 84 : 128, bottom: 24, left: isMobile ? 38 : 44 };
+        const margin = { top: 10, right: 12, bottom: 24, left: isMobile ? 38 : 44 };
         const height = isMobile ? 350 : 390;
         svg.attr("width", width).attr("height", height).attr("viewBox", "0 0 " + width + " " + height).attr("preserveAspectRatio", "xMinYMin meet");
         const iw = width - margin.left - margin.right, ih = height - margin.top - margin.bottom;
@@ -267,23 +267,6 @@
         g.append("text").attr("class", "note-label halo").attr("x", x(candEnd) - 5).attr("y", 8).attr("text-anchor", "end").text("Candidates' reports end Sept. 30");
         g.append("line").attr("class", "marker-rule").attr("x1", x(ELECTION)).attr("x2", x(ELECTION)).attr("y1", 0).attr("y2", ih);
         g.append("text").attr("class", "note-label halo").attr("x", x(ELECTION) - 5).attr("y", ih - 6).attr("text-anchor", "end").text("Election Day");
-
-        // end labels: each layer's total, at the middle of its band, nudged apart in a column
-        const endIdx = data.length - 1;
-        const labels = stack.map(l => ({ s: l.key, v: data[endIdx][l.key], y: y((l[endIdx][0] + l[endIdx][1]) / 2) })).sort((a, b) => a.y - b.y);
-        const gap = 31;
-        labels.forEach(function (l, i) { l.ly = i === 0 ? l.y : Math.max(l.y, labels[i - 1].ly + gap); });
-        for (let i = labels.length - 1; i >= 0; i--) {
-            const lim = i === labels.length - 1 ? ih + 12 : labels[i + 1].ly - gap;
-            labels[i].ly = Math.min(labels[i].ly, lim);
-        }
-        const ex = x(lastDate), lx = iw + 8;
-        labels.forEach(function (l) {
-            g.append("path").attr("d", "M" + (ex + 2) + "," + l.y + "L" + (lx - 3) + "," + l.ly).attr("fill", "none").attr("stroke", "#B9B0AB");
-            g.append("text").attr("class", "series-label").attr("x", lx).attr("y", l.ly - 3).attr("fill", INK).text(isMobile ? (SHORT[l.s] || l.s) : l.s);
-            g.append("text").attr("class", "value-label").attr("x", lx).attr("y", l.ly + 10).attr("font-weight", 400).attr("fill", "#574F54")
-                .text(money(l.v) + (l.s === "Candidates' campaigns" && !isMobile ? " (Sept. 30)" : ""));
-        });
 
         // crosshair + tooltip
         const rule = g.append("line").attr("class", "marker-rule").attr("y1", 0).attr("y2", ih).style("display", "none");
