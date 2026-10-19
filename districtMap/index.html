@@ -86,12 +86,11 @@
     .color-by-box { display: flex; flex-direction: column; gap: 4px; }
     .color-by { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
     .color-by .lbl { font-weight: 600; color: #1F161A; margin-right: 4px; }
-    .color-by button { font: inherit; font-size: 11.5px; padding: 3px 8px; border: 1px solid #CBC4BE; background: #FFFFFF; color: #1F161A; cursor: pointer; border-radius: 2px; }
-    .color-by button[aria-pressed="true"] { background: #1F161A; color: #FFFFFF; border-color: #1F161A; }
-    .color-by button.swatched { display: inline-flex; align-items: center; gap: 5px; }
-    .color-by button .sw { width: 9px; height: 9px; background: var(--c); flex: 0 0 auto; }
-    .color-by button.swatched[aria-pressed="true"] { background: var(--c); border-color: var(--c); }
-    .color-by button.swatched[aria-pressed="true"] .sw { outline: 1px solid #FFFFFF; }
+    /* buttons are plain words in their group's color; the selected one is filled with that color, in bold */
+    .color-by button { font: inherit; font-size: 11.5px; padding: 3px 7px; border: 0; background: none; color: var(--c, #1F161A); cursor: pointer; border-radius: 2px; }
+    .color-by button:hover { text-decoration: underline; text-underline-offset: 2px; }
+    .color-by button[aria-pressed="true"] { background: var(--c, #1F161A); color: #FFFFFF; font-weight: 700; text-decoration: none; }
+    .color-by button:focus-visible { outline: 2px solid #1F161A; outline-offset: 1px; }
     .ramp { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #574F54; }
     .ramp .grad { width: 140px; height: 9px; border: 1px solid rgba(31, 22, 26, 0.18); }
     .ramp .zero-swatch { width: 12px; height: 9px; border: 1px solid rgba(31, 22, 26, 0.18); }
@@ -252,11 +251,11 @@
         MODE_ROWS.forEach(function (modes, i) {
             const row = box.append("div").attr("class", "color-by");
             if (!i) row.append("span").attr("class", "lbl").text("Color map by:");
-            // group buttons double as the legend: a swatch in the group's color, filled with it when selected
+            // group buttons double as the legend: words in the group's color, filled with it when selected
             row.selectAll("button").data(modes).join("button").attr("type", "button")
                 .attr("aria-pressed", d => String(d[0] === mode))
-                .classed("swatched", d => !!COLOR[d[0]]).style("--c", d => COLOR[d[0]] || null)
-                .html(d => (COLOR[d[0]] ? "<i class='sw'></i>" : "") + esc(d[1]))
+                .style("--c", d => COLOR[d[0]] || null)
+                .text(d => d[1])
                 .on("click", function (event, d) {
                     mode = d[0];
                     box.selectAll("button").attr("aria-pressed", x => String(x[0] === mode));
