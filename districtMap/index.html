@@ -86,6 +86,7 @@
     #map-panel .stack .lbl.own-none { min-width: 0; text-align: left; font-style: italic; color: #9A9195; }
     #map-panel .hint { color: #6E656A; font-size: 11px; margin-top: 8px; font-style: italic; }
     #chart-legend { flex-direction: column; align-items: flex-start; gap: 8px; }
+    .color-by-box { display: flex; flex-direction: column; gap: 4px; }
     .color-by { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
     .color-by .lbl { font-weight: 600; color: #1F161A; margin-right: 4px; }
     .color-by button { font: inherit; font-size: 11.5px; padding: 3px 8px; border: 1px solid #CBC4BE; background: #FFFFFF; color: #1F161A; cursor: pointer; border-radius: 2px; }
@@ -121,7 +122,7 @@
     </div>
 
     <footer class="graph-footer">
-        
+        <div class="footer-note">Each group&rsquo;s bars include its ads and its cash and in-kind donations to candidates. SEIU&rsquo;s spending is shown in two forms: ads paid for by Brighter Futures Chicago, a committee funded entirely by SEIU, and SEIU committees&rsquo; cash donations to campaigns. Campaigns&rsquo; own spending, in gray, may include money from those donations.</div>
         Chart: Andrew Adams, Illinois Answers Project &middot; Source: Illinois Answers Project and Chalkbeat analysis of Illinois State Board of Elections records &middot; <a href="https://cdn.jsdelivr.net/gh/aadams-bga/schoolBoardMoney@main/districtMap/districtMap.csv" target="_blank" rel="noopener">Download the data</a>
     </footer>
 </div>
@@ -212,7 +213,9 @@
 
     const GROUPS = ["Common Ground", "INCS Action", "Urban Center", "CTU / Our Schools", "SEIU"];
     const CAMP = "Campaign", CAMP_COLOR = "#8A827F";   // each candidate's own spending, shown beside the groups' money, never summed with it
-    const MODES = [["Total", "All five groups"]].concat(GROUPS.map(g => [g, g]), [[CAMP, "Candidates' own spending"]]);
+    const NAME = g => g === "SEIU" ? "SEIU / Brighter Futures Chicago" : g;
+    // first row: the two summary views; second row: one group at a time
+    const MODE_ROWS = [[["Total", "Special interest groups"], [CAMP, "Candidates' own spending"]], GROUPS.map(g => [g, NAME(g)])];
     const RAMP_END = Object.assign({ "Total": INK, [CAMP]: CAMP_COLOR }, GROUP_COLOR);
     const COLOR = Object.assign({ [CAMP]: CAMP_COLOR }, GROUP_COLOR);
     const isGroup = l => l.group !== CAMP;
@@ -244,15 +247,18 @@
 
     function buildControls() {
         const legend = d3.select("#chart-legend").html("");
-        const row = legend.append("div").attr("class", "color-by").attr("role", "group").attr("aria-label", "Color map by");
-        row.append("span").attr("class", "lbl").text("Color map by:");
-        row.selectAll("button").data(MODES).join("button").attr("type", "button")
-            .text(d => d[1]).attr("aria-pressed", d => String(d[0] === mode))
-            .on("click", function (event, d) {
-                mode = d[0];
-                row.selectAll("button").attr("aria-pressed", x => String(x[0] === mode));
-                render();
-            });
+        const box = legend.append("div").attr("class", "color-by-box").attr("role", "group").attr("aria-label", "Color map by");
+        MODE_ROWS.forEach(function (modes, i) {
+            const row = box.append("div").attr("class", "color-by");
+            if (!i) row.append("span").attr("class", "lbl").text("Color map by:");
+            row.selectAll("button").data(modes).join("button").attr("type", "button")
+                .text(d => d[1]).attr("aria-pressed", d => String(d[0] === mode))
+                .on("click", function (event, d) {
+                    mode = d[0];
+                    box.selectAll("button").attr("aria-pressed", x => String(x[0] === mode));
+                    render();
+                });
+        });
         legend.append("div").attr("class", "ramp");
     }
 
@@ -356,7 +362,7 @@
         } else {
             html += "<h2>All 20 subdistricts</h2>";
         }
-        html += "<div class='key'>" + GROUPS.map(g => "<span><i style='background:" + GROUP_COLOR[g] + "'></i>" + esc(g) + "</span>").join("") +
+        html += "<div class='key'>" + GROUPS.map(g => "<span><i style='background:" + GROUP_COLOR[g] + "'></i>" + esc(NAME(g)) + "</span>").join("") +
             "<span><i style='background:" + STRIPE("#574F54") + "'></i>Ads against</span>" +
             "<span><i style='background:" + CAMP_COLOR + "'></i>Campaign's own spending (through Sept. 30)</span></div>";
         if (race) {
@@ -376,7 +382,7 @@
         const height = d3.select("#chart-wrapper").node().getBoundingClientRect().height;
         panel.selectAll(".track span").each(function () {
             const t = JSON.parse(this.getAttribute("data-tip"));
-            d3.select(this).datum(t).call(hover, d => '<div class="tooltip-header">' + esc(d.g) + "</div>" + d.rows.map(r => row(r[0] + (d.c ? " " + d.c : ""), dollars(r[1]))).join(""), width, height);
+            d3.select(this).datum(t).call(hover, d => '<div class="tooltip-header">' + esc(NAME(d.g)) + "</div>" + d.rows.map(r => row(r[0] + (d.c ? " " + d.c : ""), dollars(r[1]))).join(""), width, height);
         });
     }
 

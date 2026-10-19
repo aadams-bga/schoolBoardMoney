@@ -73,7 +73,7 @@
 <div id="chart-container-wrapper">
 
     <h1>Campaign spending exploded in October as campaigns enter final weeks</h1>
-    <p class="subtitle">More than one quarter of all campaign spending has been in past three weeks, according to disclosures with state election authorities. The bulk of this spending has been from a few special interest groups.</p>
+    <p class="subtitle">More than one quarter of all campaign spending has been in the past three weeks, according to disclosures with state election authorities. The bulk of this spending has been from a few special interest groups.</p>
 
     <div id="chart-legend"><span class="legend-item"><span class="legend-swatch" style="background:#8A2C38;"></span>Common Ground</span><span class="legend-item"><span class="legend-swatch" style="background:#53646D;"></span>INCS Action</span><span class="legend-item"><span class="legend-swatch" style="background:#BE8A91;"></span>Urban Center</span><span class="legend-item"><span class="legend-swatch" style="background:#353B32;"></span>SEIU</span><span class="legend-item"><span class="legend-swatch" style="background:#C06621;"></span>CTU / Our Schools (in-kind help)</span><span class="legend-item"><span class="legend-swatch" style="background:#8A827F;"></span>Candidates' campaigns</span><span class="legend-item"><span class="legend-swatch" style="background:#8A827F;background-image:repeating-linear-gradient(45deg, #8A827F 0 2px, transparent 2px 5px);background-color:transparent"></span>Candidates, not yet reported</span></div>
 
@@ -85,7 +85,7 @@
     </div>
 
     <footer class="graph-footer">
-        <div class="footer-note">SEIU expenditures were made through the committee Brighter Futures Chicago, which is entirely funded by SEIU.</div>
+        <div class="footer-note">Each group&rsquo;s spending is its ads and mail plus in-kind help to campaigns, on the date reported. Cash donations to campaigns are counted when the campaigns spend them, in candidates&rsquo; spending, which is reported through Sept. 30. SEIU&rsquo;s ads were paid for by the committee Brighter Futures Chicago, which is entirely funded by SEIU.</div>
         Chart: Andrew Adams, Illinois Answers Project &middot; Source: Illinois Answers Project and Chalkbeat analysis of Illinois State Board of Elections records &middot; <a href="https://cdn.jsdelivr.net/gh/aadams-bga/schoolBoardMoney@main/spendingOverTime/spendingOverTime.csv" target="_blank" rel="noopener">Download the data</a>
     </footer>
 </div>
@@ -262,11 +262,9 @@
         });
         g.append("line").attr("class", "axis-line").attr("x1", 0).attr("x2", iw).attr("y1", ih).attr("y2", ih);
 
-        // markers: candidates' last report and Election Day
+        // marker: candidates' last report
         g.append("line").attr("class", "marker-rule").attr("x1", x(candEnd)).attr("x2", x(candEnd)).attr("y1", 0).attr("y2", ih);
         g.append("text").attr("class", "note-label halo").attr("x", x(candEnd) - 5).attr("y", 8).attr("text-anchor", "end").text("Candidates' reports end Sept. 30");
-        g.append("line").attr("class", "marker-rule").attr("x1", x(ELECTION)).attr("x2", x(ELECTION)).attr("y1", 0).attr("y2", ih);
-        g.append("text").attr("class", "note-label halo").attr("x", x(ELECTION) - 5).attr("y", ih - 6).attr("text-anchor", "end").text("Election Day");
 
         // crosshair + tooltip
         const rule = g.append("line").attr("class", "marker-rule").attr("y1", 0).attr("y2", ih).style("display", "none");
