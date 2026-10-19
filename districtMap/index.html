@@ -71,9 +71,6 @@
     #map-panel { flex: 0 0 40%; min-width: 0; font-size: 12px; color: #1F161A; }
     #map-panel h2 { font-size: 16px; font-weight: 700; margin: 0 0 8px 0; }
     #map-panel .reset { font: inherit; font-size: 11.5px; padding: 3px 8px; margin: 0 0 8px 0; border: 1px solid #CBC4BE; background: #FFFFFF; color: #1F161A; cursor: pointer; border-radius: 2px; }
-    #map-panel .key { display: flex; flex-wrap: wrap; gap: 3px 10px; font-size: 10.5px; color: #574F54; margin-bottom: 10px; }
-    #map-panel .key span { display: inline-flex; align-items: center; gap: 4px; }
-    #map-panel .key i { width: 9px; height: 9px; display: inline-block; }
     #map-panel .cand { margin-bottom: 9px; }
     #map-panel .cand-name { display: flex; align-items: baseline; gap: 6px; font-weight: 700; font-size: 12px; }
     #map-panel .cand-name .race { color: #6E656A; font-weight: 600; }
@@ -91,6 +88,10 @@
     .color-by .lbl { font-weight: 600; color: #1F161A; margin-right: 4px; }
     .color-by button { font: inherit; font-size: 11.5px; padding: 3px 8px; border: 1px solid #CBC4BE; background: #FFFFFF; color: #1F161A; cursor: pointer; border-radius: 2px; }
     .color-by button[aria-pressed="true"] { background: #1F161A; color: #FFFFFF; border-color: #1F161A; }
+    .color-by button.swatched { display: inline-flex; align-items: center; gap: 5px; }
+    .color-by button .sw { width: 9px; height: 9px; background: var(--c); flex: 0 0 auto; }
+    .color-by button.swatched[aria-pressed="true"] { background: var(--c); border-color: var(--c); }
+    .color-by button.swatched[aria-pressed="true"] .sw { outline: 1px solid #FFFFFF; }
     .ramp { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #574F54; }
     .ramp .grad { width: 140px; height: 9px; border: 1px solid rgba(31, 22, 26, 0.18); }
     .ramp .zero-swatch { width: 12px; height: 9px; border: 1px solid rgba(31, 22, 26, 0.18); }
@@ -220,7 +221,7 @@
     const COLOR = Object.assign({ [CAMP]: CAMP_COLOR }, GROUP_COLOR);
     const isGroup = l => l.group !== CAMP;
     const ZERO = "#EEE9E4";
-    let features = null, lines = null, mode = "Total", pinned = null, hovered = null;
+    let features = null, lines = null, mode = "Total", pinned = null, hovered = null, pointerFocus = false;
 
     Promise.all([d3.json("subdistricts.geojson"), d3.csv("districtMap.csv", d => ({ race: d.race, candidate: d.candidate, group: d.group, kind: d.kind, amount: num(d.amount) || 0 }))])
         .then(function ([geo, rows]) {
@@ -251,8 +252,11 @@
         MODE_ROWS.forEach(function (modes, i) {
             const row = box.append("div").attr("class", "color-by");
             if (!i) row.append("span").attr("class", "lbl").text("Color map by:");
+            // group buttons double as the legend: a swatch in the group's color, filled with it when selected
             row.selectAll("button").data(modes).join("button").attr("type", "button")
-                .text(d => d[1]).attr("aria-pressed", d => String(d[0] === mode))
+                .attr("aria-pressed", d => String(d[0] === mode))
+                .classed("swatched", d => !!COLOR[d[0]]).style("--c", d => COLOR[d[0]] || null)
+                .html(d => (COLOR[d[0]] ? "<i class='sw'></i>" : "") + esc(d[1]))
                 .on("click", function (event, d) {
                     mode = d[0];
                     box.selectAll("button").attr("aria-pressed", x => String(x[0] === mode));
@@ -296,16 +300,37 @@
             .attr("d", path).attr("fill", d => fill(vals.get(d.properties.race)))
             .attr("tabindex", 0).attr("role", "button")
             .attr("aria-label", d => "Subdistrict " + d.properties.race + ": " + money(vals.get(d.properties.race)))
-            .on("mouseenter", function (event, d) { hovered = d.properties.race; mark(); showPanel(hovered); })
-            .on("mouseleave", function () { hovered = null; mark(); showPanel(pinned); })
-            .on("click", function (event, d) { pinned = pinned === d.properties.race ? null : d.properties.race; mark(); showPanel(pinned || hovered); })
-            .on("focus", function (event, d) { pinned = d.properties.race; mark(); showPanel(pinned); })
-            .on("keydown", function (event) { if (event.key === "Escape") { clearSelection(); this.blur(); } });
+            // hover previews a subdistrict only while none is selected, so the pointer can cross neighbors on its way to the panel
+            .on("mouseenter", function (event, d) { if (pinned || hovered === d.properties.race) return; hovered = d.properties.race; mark(); showPanel(hovered); })
+            .on("mouseleave", function () { if (pinned) return; hovered = null; mark(); showPanel(null); })
+            // a mouse press focuses the path before the click; flag it so focus doesn't select and the click then unselect
+            .on("pointerdown", function () { pointerFocus = true; })
+            .on("click", function (event, d) {
+                pointerFocus = false;
+                hovered = null;
+                pinned = pinned === d.properties.race ? null : d.properties.race;
+                mark(); showPanel(pinned);
+            })
+            .on("focus", function (event, d) {
+                if (pointerFocus) return;   // keyboard focus selects
+                pinned = d.properties.race; mark(); showPanel(pinned);
+            })
+            .on("keydown", function (event, d) {
+                if (event.key === "Escape") { clearSelection(); this.blur(); }
+                else if (event.key === "Enter" || event.key === " ") { event.preventDefault(); pinned = pinned === d.properties.race ? null : d.properties.race; mark(); showPanel(pinned); }
+            });
         // raise the active outline above its neighbors
+        // Re-appending a path under the pointer fires mouseenter again and makes Chrome drop the click,
+        // so raise only when the highlighted subdistrict actually changes.
+        let raised = null;
         function mark() {
             const a = hovered || pinned;
-            g.selectAll("path.district").classed("active", d => d.properties.race === a).filter(d => d.properties.race === a).raise();
-            g.selectAll("text").raise();
+            g.selectAll("path.district").classed("active", d => d.properties.race === a);
+            if (a && a !== raised) {
+                g.selectAll("path.district").filter(d => d.properties.race === a).raise();
+                g.selectAll("text").raise();
+            }
+            raised = a;
         }
 
         g.selectAll("text").data(features).join("text").attr("class", "district-label")
@@ -362,9 +387,6 @@
         } else {
             html += "<h2>All 20 subdistricts</h2>";
         }
-        html += "<div class='key'>" + GROUPS.map(g => "<span><i style='background:" + GROUP_COLOR[g] + "'></i>" + esc(NAME(g)) + "</span>").join("") +
-            "<span><i style='background:" + STRIPE("#574F54") + "'></i>Ads against</span>" +
-            "<span><i style='background:" + CAMP_COLOR + "'></i>Campaign's own spending (through Sept. 30)</span></div>";
         if (race) {
             const f = features.find(x => x.properties.race === race);
             html += candidateRows(all, f.properties.candidates.map(c => ({ name: c.name, incumbent: c.incumbent, race: race })), false);
