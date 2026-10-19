@@ -22,6 +22,8 @@ race,candidate,group,kind,amount
 1B,Michelle N. Pierre,Urban Center,Ads supporting,10968
 1B,Michelle N. Pierre,Urban Center,Gifts and in-kind,2000
 2A,Ebony DeBerry,CTU / Our Schools,Gifts and in-kind,705
+2A,Hector Morales,INCS Action,Gifts and in-kind,1008
+2A,Hector Morales,Urban Center,Gifts and in-kind,1000
 2B,"Deborah ""Debby"" Pope",CTU / Our Schools,Gifts and in-kind,34012
 2B,"Deborah ""Debby"" Pope",Common Ground,Ads opposing,40156
 2B,Kyna Lenhof,Common Ground,Ads supporting,73293
@@ -30,6 +32,7 @@ race,candidate,group,kind,amount
 2B,Kyna Lenhof,INCS Action,Gifts and in-kind,11860
 3A,Norma Rios Sierra,CTU / Our Schools,Gifts and in-kind,23982
 3A,Norma Rios Sierra,Common Ground,Ads opposing,135540
+3A,Norma Rios Sierra,SEIU,Gifts and in-kind,10000
 3A,Peter Gonzales,Common Ground,Ads supporting,76335
 3A,Peter Gonzales,Common Ground,Gifts and in-kind,1277
 3A,Peter Gonzales,INCS Action,Ads supporting,107080
@@ -87,7 +90,8 @@ race,candidate,group,kind,amount
 6A,Isaiah White,Urban Center,Ads supporting,17990
 6A,Isaiah White,Urban Center,Gifts and in-kind,5283
 6B,Brittany B. Kimble,INCS Action,Gifts and in-kind,3000
-6B,Brittany B. Kimble,Urban Center,Gifts and in-kind,11209
+6B,Brittany B. Kimble,Urban Center,Gifts and in-kind,16209
+6B,Michael L. Neal,INCS Action,Gifts and in-kind,3000
 7A,Emma Lozano,CTU / Our Schools,Gifts and in-kind,15136
 7A,Emma Lozano,Common Ground,Ads opposing,125540
 7A,Jesus Ayala Jr.,Common Ground,Ads supporting,76335
@@ -95,7 +99,7 @@ race,candidate,group,kind,amount
 7A,Jesus Ayala Jr.,INCS Action,Ads supporting,92222
 7A,Jesus Ayala Jr.,INCS Action,Gifts and in-kind,9645
 7A,Jesus Ayala Jr.,SEIU,Ads supporting,57673
-7A,Jesus Ayala Jr.,SEIU,Gifts and in-kind,15000
+7A,Jesus Ayala Jr.,SEIU,Gifts and in-kind,25000
 7A,Jesus Ayala Jr.,Urban Center,Ads supporting,10121
 7A,Jesus Ayala Jr.,Urban Center,Gifts and in-kind,2496
 7B,Erika E. Diaz-Chavez,INCS Action,Ads supporting,89178
