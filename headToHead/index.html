@@ -178,6 +178,7 @@
     d3.csv("headToHead.csv", function (d) {
         const r = {
             race: d.race, ctu: d.ctu_candidate, ctuInc: d.ctu_incumbent === "1", reform: d.reform_candidate, reformInc: d.reform_incumbent === "1",
+            ctuWI: d.ctu_write_in === "1", reformWI: d.reform_write_in === "1",
             ctuTotal: num(d["CTU / Our Schools"]) || 0, adsFor: num(d["Ads for reform candidate"]) || 0,
             adsAgainst: num(d["Ads against CTU candidate"]) || 0, inkind: num(d["In-kind help to reform candidate"]) || 0
         };
@@ -225,9 +226,9 @@
 
         rows.append("text").attr("class", "row-label").attr("x", 0).attr("y", by + barH / 2).attr("dy", "0.32em").text(d => d.race);
         rows.append("text").attr("class", "name-label").attr("x", mid - 5).attr("y", 10).attr("text-anchor", "end")
-            .text(d => lastName(d.ctu) + (d.ctuInc ? " •" : ""));
+            .text(d => lastName(d.ctu) + (d.ctuWI ? " (write-in)" : "") + (d.ctuInc ? " •" : ""));
         rows.append("text").attr("class", "name-label").attr("x", mid + 5).attr("y", 10)
-            .text(d => lastName(d.reform) + (d.reformInc ? " •" : ""));
+            .text(d => lastName(d.reform) + (d.reformWI ? " (write-in)" : "") + (d.reformInc ? " •" : ""));
 
         rows.append("rect").attr("x", d => mid - 1 - Math.max(2, d.ctuTotal * k)).attr("y", by).attr("height", barH)
             .attr("width", d => Math.max(2, d.ctuTotal * k)).attr("fill", GROUP_COLOR["CTU / Our Schools"]);
@@ -248,9 +249,9 @@
 
         rows.append("rect").attr("x", 0).attr("y", 0).attr("width", width).attr("height", rowH - 2).attr("fill", "transparent")
             .call(hover, d => '<div class="tooltip-header">Subdistrict ' + esc(d.race) + "</div>" +
-                row(d.ctu + (d.ctuInc ? " (inc.)" : "") + ": CTU / Our Schools", dollars(d.ctuTotal), GROUP_COLOR["CTU / Our Schools"]) +
+                row(d.ctu + (d.ctuWI ? " (write-in)" : "") + (d.ctuInc ? " (inc.)" : "") + ": CTU / Our Schools", dollars(d.ctuTotal), GROUP_COLOR["CTU / Our Schools"]) +
                 d.groups.map(s => row(s.name, dollars(s.value), GROUP_COLOR[s.name])).join("") +
-                '<div class="tooltip-note" style="margin-top:4px">For ' + esc(d.reform) + (d.reformInc ? " (inc.)" : "") + ": " +
+                '<div class="tooltip-note" style="margin-top:4px">For ' + esc(d.reform) + (d.reformWI ? " (write-in)" : "") + (d.reformInc ? " (inc.)" : "") + ": " +
                 "ads for " + money(d.adsFor) + ", ads against " + esc(lastName(d.ctu)) + " " + money(d.adsAgainst) + ", in-kind help " + money(d.inkind) + "</div>", width, height);
     }
 

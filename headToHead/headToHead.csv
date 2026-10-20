@@ -1,13 +1,14 @@
-race,ctu_candidate,ctu_incumbent,reform_candidate,reform_incumbent,CTU / Our Schools,Common Ground,INCS Action,Urban Center,SEIU,Ads for reform candidate,Ads against CTU candidate,In-kind help to reform candidate
-7A,Emma Lozano,1,Jesus Ayala Jr.,0,15136,211020,93867,11617,57673,236351,125540,12286
-3A,Norma Rios Sierra,1,Peter Gonzales,0,23982,213152,108356,10272,0,193062,135540,3178
-6A,Anusha Thotakura,1,Isaiah White,0,33697,254018,121089,19273,0,308744,80500,5136
-3B,Jason Dónes,0,Carlos A. Rivas Jr.,1,34861,181702,131292,9653,46366,286576,78050,4387
-1B,Claudia Peralta,0,Michelle N. Pierre,0,42988,257157,138278,10968,0,263482,139690,3231
-1A,Ed Bannon,1,Margie B. Luczak,0,15473,0,119803,20704,0,138464,0,2043
-4A,Karen Zaccor,1,Ellen Sherratt,0,62749,204285,159586,14337,75566,318089,131328,4357
-2B,"Deborah ""Debby"" Pope",1,Kyna Lenhof,0,34012,117309,125404,0,0,194837,40156,7720
-5B,"Michilla ""Kyla"" Blaise",1,Anthony Hargrove,0,55353,213307,111730,9913,0,196234,135540,3176
-5A,"Aaron ""Jitu"" Brown",1,LaPamela Williams,0,53483,178636,106752,10374,0,232547,59000,4215
-10B,Connie Anderson,0,Patrick C. Watson,0,46123,118449,116626,10658,0,195577,50156,0
-9B,Katherine S. Dunneback,0,Therese Boyle,1,46823,4423,147271,0,84825,232096,0,4423
+race,ctu_candidate,ctu_incumbent,reform_candidate,reform_incumbent,CTU / Our Schools,Common Ground,INCS Action,Urban Center,SEIU,Ads for reform candidate,Ads against CTU candidate,In-kind help to reform candidate,ctu_write_in,reform_write_in
+7A,Emma Lozano,1,Jesus Ayala Jr.,0,15136,211020,93867,11617,57673,236351,125540,12286,0,0
+3A,Norma Rios Sierra,1,Peter Gonzales,0,23982,213152,108356,10272,0,193062,135540,3178,0,0
+6A,Anusha Thotakura,1,Isaiah White,0,33697,254018,121089,19273,0,308744,80500,5136,0,0
+3B,Jason Dónes,0,Carlos A. Rivas Jr.,1,34861,181702,131292,9653,46366,286576,78050,4387,0,0
+1B,Claudia Peralta,0,Michelle N. Pierre,0,42988,257157,138278,10968,0,263482,139690,3231,0,0
+1A,Ed Bannon,1,Margie B. Luczak,0,15473,0,119803,20704,0,138464,0,2043,0,0
+4A,Karen Zaccor,1,Ellen Sherratt,0,62749,204285,159586,14337,75566,318089,131328,4357,0,0
+2B,"Deborah ""Debby"" Pope",1,Kyna Lenhof,0,34012,117309,125404,0,0,194837,40156,7720,0,0
+5B,"Michilla ""Kyla"" Blaise",1,Anthony Hargrove,0,55353,213307,111730,9913,0,196234,135540,3176,0,0
+5A,"Aaron ""Jitu"" Brown",1,LaPamela Williams,0,53483,178636,106752,10374,0,232547,59000,4215,0,0
+10B,Connie Anderson,0,Patrick C. Watson,0,46123,118449,116626,10658,0,195577,50156,0,0,0
+9B,Katherine S. Dunneback,0,Therese Boyle,1,46823,4423,147271,0,84825,232096,0,4423,0,0
+10A,Tameka Walton,0,"Che ""Rhymefest"" Smith",1,38249,0,78598,0,0,78598,0,0,1,0

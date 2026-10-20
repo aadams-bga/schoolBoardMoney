@@ -350,7 +350,7 @@
         });
         const scale = fixedScale || d3.max(data, d => Math.max(d.forT, d.agT, d.ownT)) || 1;
         return data.map(d => "<div class='cand'><div class='cand-name" + (d.forT + d.agT ? "" : " none") + "'>" +
-            (showRace ? "<span class='race'>" + esc(d.c.race) + "</span>" : "") + esc(d.c.name) + (d.c.incumbent ? " (inc.)" : "") +
+            (showRace ? "<span class='race'>" + esc(d.c.race) + "</span>" : "") + esc(d.c.name) + (d.c.writeIn ? " (write-in)" : "") + (d.c.incumbent ? " (inc.)" : "") +
             "</div>" +
             stack(d.forP, scale, false, d.forT) + stack(d.agP, scale, true, d.agT) +
             (d.noReport ? "<div class='stack'><span class='lbl own-none'>Campaign: no report filed</span></div>"
@@ -368,10 +368,10 @@
         }
         if (race) {
             const f = features.find(x => x.properties.race === race);
-            html += candidateRows(all, f.properties.candidates.map(c => ({ name: c.name, incumbent: c.incumbent, race: race })), false);
+            html += candidateRows(all, f.properties.candidates.map(c => ({ name: c.name, incumbent: c.incumbent, writeIn: c.write_in, race: race })), false);
         } else {
             const top = features.slice().sort((a, b) => amountFor(b.properties.race, "Total") - amountFor(a.properties.race, "Total")).slice(0, 5);
-            const candsOf = f => f.properties.candidates.map(c => ({ name: c.name, incumbent: c.incumbent, race: f.properties.race }));
+            const candsOf = f => f.properties.candidates.map(c => ({ name: c.name, incumbent: c.incumbent, writeIn: c.write_in, race: f.properties.race }));
             const scale = d3.max(top.flatMap(candsOf), c => {
                 const mine = lines.filter(l => l.candidate === c.name && l.race === c.race);
                 const sum = pred => d3.sum(mine.filter(pred), l => l.amount);
