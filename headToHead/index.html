@@ -73,7 +73,7 @@
 <div id="chart-container-wrapper">
 
     <h1>Chicago Teachers Union is outspent by anti-CTU groups in races around Chicago</h1>
-    <p class="subtitle">Groups like Common Ground Collective and INCS Action are spending heavily to defeat CTU-backed candidates. For incumbents like Norma Rios Sierra and Anusha Thotakura, special interest groups are outspending CTU by more than 10-to-1. For the most lopsided race, for incumbent Emma Lozano&rsquo;s seat, the CTU is being outspent by about 25-to-1.</p>
+    <p class="subtitle">Groups like Common Ground Collective and INCS Action are spending heavily to defeat CTU-backed candidates. For incumbents like Norma Rios-Sierra and Anusha Thotakura, special interest groups are outspending CTU by more than 10-to-1. For the most lopsided race, for incumbent Emma Lozano&rsquo;s seat, the CTU is being outspent by about 25-to-1.</p>
 
     <div id="chart-legend"><span class="legend-item"><span class="legend-swatch" style="background:#C0282F;"></span>CTU / Our Schools</span><span class="legend-item"><span class="legend-swatch" style="background:#2B5DA8;"></span>Common Ground</span><span class="legend-item"><span class="legend-swatch" style="background:#2E9A6E;"></span>INCS Action</span><span class="legend-item"><span class="legend-swatch" style="background:#B8860B;"></span>Urban Center</span><span class="legend-item"><span class="legend-swatch" style="background:#C77DD6;"></span>SEIU / Brighter Futures Chicago</span><span class="legend-item">&bull; Incumbent</span></div>
 
@@ -194,7 +194,7 @@
 
     function lastName(n) {
         const clean = n.replace(/"[^"]*"/g, "").replace(/,?\s*\b(Jr|Sr)\.?$/i, "").trim();
-        const two = clean.match(/\b(Rios Sierra|Diaz-Chavez|Bailey Preston)$/);
+        const two = clean.match(/\b(Bailey Preston)$/);
         return two ? two[1] : clean.split(/\s+/).pop();
     }
 
