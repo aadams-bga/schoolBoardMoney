@@ -88,8 +88,7 @@
     .color-by-box { display: flex; flex-direction: column; gap: 6px; margin-bottom: 4px; }
     .color-by { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
     .color-by .lbl { font-weight: 600; color: #1F161A; margin-right: 4px; }
-    /* buttons are plain words in their group's color; the selected one is filled with that color, in bold */
-    .color-by button { font: inherit; font-size: 11.5px; font-weight: 700; padding: 6px 7px; border: 0; background: none; color: var(--c, #1F161A); cursor: pointer; border-radius: 2px; }
+        .color-by button { font: inherit; font-size: 11.5px; font-weight: 700; padding: 6px 7px; border: 0; background: none; color: var(--c, #1F161A); cursor: pointer; border-radius: 2px; }
     .color-by button:hover { text-decoration: underline; text-underline-offset: 2px; }
     .color-by button[aria-pressed="true"] { background: var(--c, #1F161A); color: #FFFFFF; font-weight: 700; text-decoration: none; }
     .color-by button:focus-visible { outline: 2px solid #1F161A; outline-offset: 1px; }
@@ -142,7 +141,6 @@
     const GRAY_LIGHT = "#CBC4BE";
     const FAINT = "#D8D2CC";
 
-    // one color per group, the same in every graphic in this package
     const GROUP_COLOR = {
         "Common Ground": BLUE, "INCS Action": GREEN, "Urban Center": GOLD, "SEIU": ORCHID,
         "CTU / Our Schools": RED, "Candidates' campaigns": CAND_GRAY
@@ -202,7 +200,6 @@
             .on("mouseleave", function () { tooltip.style("display", "none"); });
     }
 
-    // diagonal hatch in a group's color, for spending after Sept. 30 / undisclosed money
     function hatch(defs, id, color) {
         const p = defs.append("pattern").attr("id", id).attr("width", 6).attr("height", 6)
             .attr("patternUnits", "userSpaceOnUse").attr("patternTransform", "rotate(45)");
@@ -213,13 +210,10 @@
 
 
     const GROUPS = ["Common Ground", "INCS Action", "Urban Center", "CTU / Our Schools", "SEIU"];
-    const CAMP = "Campaign", CAMP_COLOR = CAND_GRAY;   // each candidate's own spending, shown beside the groups' money, never summed with it
+    const CAMP = "Campaign", CAMP_COLOR = CAND_GRAY;
     const NAME = g => g === "SEIU" ? "SEIU / Brighter Futures Chicago" : g;
-    // first row: the two summary views; second row: one group at a time
     const MODE_ROWS = [[["Total", "Special interest groups"], [CAMP, "Candidates' own spending"]], GROUPS.map(g => [g, NAME(g)])];
     const COLOR = Object.assign({ [CAMP]: CAMP_COLOR }, GROUP_COLOR);
-    // gold, orchid and the campaigns' gray are too pale for small text on white or for the dark end of a map ramp,
-    // so the buttons and the map shading use darker versions of them
     const TEXT_COLOR = Object.assign({}, COLOR, { [CAMP]: "#6E656A", "Urban Center": "#8A6508", "SEIU": "#9A4FAE" });
     const RAMP_END = Object.assign({ "Total": INK }, TEXT_COLOR);
     const isGroup = l => l.group !== CAMP;
@@ -228,15 +222,12 @@
 
     Promise.all([d3.json("subdistricts.geojson"), d3.csv("districtMap.csv", d => ({ race: d.race, candidate: d.candidate, group: d.group, kind: d.kind, amount: num(d.amount) || 0 }))])
         .then(function ([geo, rows]) {
-            // planar map: scale longitude by cos(latitude) so Chicago isn't stretched
             const k = Math.cos(41.84 * Math.PI / 180);
             geo.features.forEach(f => f.geometry.coordinates.forEach(poly => poly.forEach(ring => ring.forEach(pt => { pt[0] *= k; }))));
             features = geo.features;
             lines = rows;
-            // a link ending in #7A (or any subdistrict) opens with that subdistrict selected
             const h = decodeURIComponent(location.hash.slice(1)).toUpperCase();
             if (features.some(f => f.properties.race === h)) pinned = h;
-            // the panel has to exist before the first render so the map is sized to the space beside it
             d3.select("#chart-wrapper").append("div").attr("id", "map-panel").attr("aria-live", "polite");
             buildControls();
             render();
@@ -255,7 +246,6 @@
         MODE_ROWS.forEach(function (modes, i) {
             const row = box.append("div").attr("class", "color-by");
             if (!i) row.append("span").attr("class", "lbl").text("Color map by:");
-            // group buttons double as the legend: words in the group's color, filled with it when selected
             row.selectAll("button").data(modes).join("button").attr("type", "button")
                 .attr("aria-pressed", d => String(d[0] === mode))
                 .style("--c", d => TEXT_COLOR[d[0]] || null)
@@ -282,7 +272,6 @@
 
         const vals = new Map(features.map(f => [f.properties.race, amountFor(f.properties.race, mode)]));
         const max = d3.max(vals.values()) || 1;
-        // square-root scale, and any money at all starts at a visible tint, so a $5,000 district never reads as empty
         const lo = d3.interpolateLab("#F3EEE9", RAMP_END[mode])(0.18);
         const color = d3.scaleSqrt().domain([0, max]).range([lo, RAMP_END[mode]]).interpolate(d3.interpolateLab);
         const fill = v => v > 0 ? color(v) : ZERO;
@@ -292,7 +281,6 @@
         ramp.append("span").attr("class", "grad").style("background", "linear-gradient(to right, " + d3.range(0, 1.01, 0.1).map(t => color(t * t * max)).join(", ") + ")");
         ramp.append("span").text(money(max));
 
-        // clicking empty space around the map, or pressing Escape, goes back to all of Chicago
         svg.append("rect").attr("width", width).attr("height", height).attr("fill", "transparent").on("click", clearSelection);
         const g = svg.append("g");
         g.selectAll("path").data(features).join("path")
@@ -300,10 +288,8 @@
             .attr("d", path).attr("fill", d => fill(vals.get(d.properties.race)))
             .attr("tabindex", 0).attr("role", "button")
             .attr("aria-label", d => "Subdistrict " + d.properties.race + ": " + money(vals.get(d.properties.race)))
-            // hover previews a subdistrict only while none is selected, so the pointer can cross neighbors on its way to the panel
             .on("mouseenter", function (event, d) { if (pinned || hovered === d.properties.race) return; hovered = d.properties.race; mark(); showPanel(hovered); })
             .on("mouseleave", function () { if (pinned) return; hovered = null; mark(); showPanel(null); })
-            // a mouse press focuses the path before the click; flag it so focus doesn't select and the click then unselect
             .on("pointerdown", function () { pointerFocus = true; })
             .on("click", function (event, d) {
                 pointerFocus = false;
@@ -312,16 +298,13 @@
                 mark(); showPanel(pinned);
             })
             .on("focus", function (event, d) {
-                if (pointerFocus) return;   // keyboard focus selects
+                if (pointerFocus) return;
                 pinned = d.properties.race; mark(); showPanel(pinned);
             })
             .on("keydown", function (event, d) {
                 if (event.key === "Escape") { clearSelection(); this.blur(); }
                 else if (event.key === "Enter" || event.key === " ") { event.preventDefault(); pinned = pinned === d.properties.race ? null : d.properties.race; mark(); showPanel(pinned); }
             });
-        // raise the active outline above its neighbors
-        // Re-appending a path under the pointer fires mouseenter again and makes Chrome drop the click,
-        // so raise only when the highlighted subdistrict actually changes.
         let raised = null;
         function mark() {
             const a = hovered || pinned;
@@ -344,7 +327,6 @@
 
     function clearSelection() { pinned = null; hovered = null; svg.selectAll("path.district").classed("active", false); showPanel(null); }
 
-    // one stacked bar: segments by group, solid for money helping the candidate, striped for ads against
     function stack(parts, scale, against, total) {
         if (!total) return "";
         return "<div class='stack'><div class='track'>" + parts.filter(p => p.v > 0).map(p =>
@@ -353,7 +335,6 @@
     }
 
     function candidateRows(rows, cands, showRace, fixedScale) {
-        // per candidate: money for (ads supporting + in-kind help) and ads against, split by group
         const data = cands.map(function (c) {
             const mine = rows.filter(l => l.candidate === c.name && l.race === c.race);
             const part = (g, against) => {
@@ -389,7 +370,6 @@
             const f = features.find(x => x.properties.race === race);
             html += candidateRows(all, f.properties.candidates.map(c => ({ name: c.name, incumbent: c.incumbent, race: race })), false);
         } else {
-            // citywide: the five subdistricts with the most outside money, every candidate in each, on one shared scale
             const top = features.slice().sort((a, b) => amountFor(b.properties.race, "Total") - amountFor(a.properties.race, "Total")).slice(0, 5);
             const candsOf = f => f.properties.candidates.map(c => ({ name: c.name, incumbent: c.incumbent, race: f.properties.race }));
             const scale = d3.max(top.flatMap(candsOf), c => {

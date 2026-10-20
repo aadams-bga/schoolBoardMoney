@@ -104,7 +104,6 @@
     const GRAY_LIGHT = "#CBC4BE";
     const FAINT = "#D8D2CC";
 
-    // one color per group, the same in every graphic in this package
     const GROUP_COLOR = {
         "Common Ground": BLUE, "INCS Action": GREEN, "Urban Center": GOLD, "SEIU": ORCHID,
         "CTU / Our Schools": RED, "Candidates' campaigns": CAND_GRAY
@@ -164,7 +163,6 @@
             .on("mouseleave", function () { tooltip.style("display", "none"); });
     }
 
-    // diagonal hatch in a group's color, for spending after Sept. 30 / undisclosed money
     function hatch(defs, id, color) {
         const p = defs.append("pattern").attr("id", id).attr("width", 6).attr("height", 6)
             .attr("patternUnits", "userSpaceOnUse").attr("patternTransform", "rotate(45)");
@@ -174,7 +172,6 @@
     }
 
 
-    // bottom of the stack to top
     const SERIES = ["Candidates' campaigns", "CTU / Our Schools", "SEIU", "Urban Center", "INCS Action", "Common Ground"];
     const SHORT = { "Candidates' campaigns": "Candidates", "CTU / Our Schools": "CTU" };
     const START = new Date("2026-01-01T12:00:00"), ELECTION = new Date("2026-11-03T12:00:00");
@@ -183,7 +180,6 @@
     let data = null, candEnd = null, lastDate = null;
 
     d3.csv("spendingOverTime.csv").then(function (rows) {
-        // daily running totals; a blank cell means that spender hasn't reported that far yet
         const run = {};
         SERIES.forEach(s => { run[s] = 0; });
         const daily = rows.map(function (d) {
@@ -197,7 +193,6 @@
             return p;
         });
         lastDate = daily[daily.length - 1].date;
-        // sample weekly so the curves are smooth, plus the last reported day
         const at = function (t) {
             let p = null;
             for (const d of daily) { if (d.date <= t) p = d; else break; }
@@ -242,9 +237,7 @@
                 .text(d3.timeFormat(i === 0 ? "%b %Y" : "%b")(dt));
         });
 
-        // monotone curves are smooth but never dip, so a running total never looks like it went down
         const area = d3.area().curve(d3.curveMonotoneX).x(d => x(d.data.date)).y0(d => y(d[0])).y1(d => y(d[1]));
-        // candidates have reported only through Sept. 30: past that their layer is carried flat and hatched
         defs.append("clipPath").attr("id", "cand-reported").append("rect").attr("x", -1).attr("y", -10).attr("width", x(candEnd) + 1).attr("height", ih + 20);
         defs.append("clipPath").attr("id", "cand-unreported").append("rect").attr("x", x(candEnd)).attr("y", -10).attr("width", iw).attr("height", ih + 20);
         const candHatch = hatch(defs, "cand-hatch", GROUP_COLOR["Candidates' campaigns"]);
@@ -256,17 +249,14 @@
             } else {
                 g.append("path").datum(layer).attr("d", area).attr("fill", c);
             }
-            // thin surface-colored edge between layers
             g.append("path").datum(layer).attr("d", d3.line().curve(d3.curveMonotoneX).x(d => x(d.data.date)).y(d => y(d[1])))
                 .attr("fill", "none").attr("stroke", "#FFFFFF").attr("stroke-width", 1);
         });
         g.append("line").attr("class", "axis-line").attr("x1", 0).attr("x2", iw).attr("y1", ih).attr("y2", ih);
 
-        // marker: candidates' last report
         g.append("line").attr("class", "marker-rule").attr("x1", x(candEnd)).attr("x2", x(candEnd)).attr("y1", 0).attr("y2", ih);
         g.append("text").attr("class", "note-label halo").attr("x", x(candEnd) - 5).attr("y", 8).attr("text-anchor", "end").text("Candidates' reports end Sept. 30");
 
-        // crosshair + tooltip
         const rule = g.append("line").attr("class", "marker-rule").attr("y1", 0).attr("y2", ih).style("display", "none");
         const bis = d3.bisector(d => d.date).right;
         g.append("rect").attr("width", x(lastDate)).attr("height", ih).attr("fill", "transparent").classed("hit", true)

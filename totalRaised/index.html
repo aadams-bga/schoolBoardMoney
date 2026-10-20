@@ -104,7 +104,6 @@
     const GRAY_LIGHT = "#CBC4BE";
     const FAINT = "#D8D2CC";
 
-    // one color per group, the same in every graphic in this package
     const GROUP_COLOR = {
         "Common Ground": BLUE, "INCS Action": GREEN, "Urban Center": GOLD, "SEIU": ORCHID,
         "CTU / Our Schools": RED, "Candidates' campaigns": CAND_GRAY
@@ -164,7 +163,6 @@
             .on("mouseleave", function () { tooltip.style("display", "none"); });
     }
 
-    // diagonal hatch in a group's color, for spending after Sept. 30 / undisclosed money
     function hatch(defs, id, color) {
         const p = defs.append("pattern").attr("id", id).attr("width", 6).attr("height", 6)
             .attr("patternUnits", "userSpaceOnUse").attr("patternTransform", "rotate(45)");
@@ -185,7 +183,6 @@
         SOURCES.forEach(k => { o[k] = num(d[k]) || 0; });
         return o;
     }).then(function (rows) {
-        // within each subdistrict, the candidate who raised the most first
         data = rows.sort((a, b) => RACES.indexOf(a.race) - RACES.indexOf(b.race) || b.total - a.total);
         render();
         window.addEventListener("resize", render);
@@ -223,7 +220,6 @@
                 svg.append("text").attr("class", "row-label").attr("x", 0).attr("y", cy).attr("dy", "0.32em").text(d.race);
                 if (r.y > top) svg.append("line").attr("x1", 0).attr("x2", width).attr("y1", r.y - raceGap / 2).attr("y2", r.y - raceGap / 2).attr("stroke", "#EEE9E4");
             }
-            // on phones, drop nicknames and middle initials so names fit beside the bars
             const name = (isMobile ? d.candidate.replace(/ "[^"]*"/, "").replace(/ [A-Z]\.(?= )/g, "") : d.candidate) + (d.incumbent ? " *" : "");
             svg.append("text").attr("class", "name-label").attr("x", raceW).attr("y", cy).attr("dy", "0.32em").attr("fill", INK).text(name);
             if (!d.filed) {
