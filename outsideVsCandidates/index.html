@@ -75,7 +75,7 @@
     <h1>Lorem ipsum dolor sit amet, consectetur adipiscing elit</h1>
     <p class="subtitle">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation.</p>
 
-    <div id="chart-legend"><span class="legend-item"><span class="legend-swatch" style="background:#8A827F;"></span>Candidates' campaigns</span><span class="legend-item"><span class="legend-swatch" style="background:#8A2C38;"></span>Common Ground</span><span class="legend-item"><span class="legend-swatch" style="background:#53646D;"></span>INCS Action</span><span class="legend-item"><span class="legend-swatch" style="background:#BE8A91;"></span>Urban Center</span><span class="legend-item"><span class="legend-swatch" style="background:#353B32;"></span>SEIU</span><span class="legend-item"><span class="legend-swatch" style="background:#574F54;background-image:repeating-linear-gradient(45deg, #574F54 0 2px, transparent 2px 5px);background-color:transparent"></span>Oct. 1-15</span></div>
+    <div id="chart-legend"><span class="legend-item"><span class="legend-swatch" style="background:#BDB6B2;"></span>Candidates' campaigns</span><span class="legend-item"><span class="legend-swatch" style="background:#2B5DA8;"></span>Common Ground</span><span class="legend-item"><span class="legend-swatch" style="background:#2E9A6E;"></span>INCS Action</span><span class="legend-item"><span class="legend-swatch" style="background:#B8860B;"></span>Urban Center</span><span class="legend-item"><span class="legend-swatch" style="background:#C77DD6;"></span>SEIU</span><span class="legend-item"><span class="legend-swatch" style="background:#574F54;background-image:repeating-linear-gradient(45deg, #574F54 0 2px, transparent 2px 5px);background-color:transparent"></span>Oct. 1-15</span></div>
 
     <div id="chart-wrapper" style="position: relative;">
         <div id="chart-container">
@@ -85,7 +85,7 @@
     </div>
 
     <footer class="graph-footer">
-        <div class="footer-note">Super PAC spending is independent spending only: ads and mail paid for by the groups, Jan. 2025 through Oct. 15. Candidates&rsquo; spending is from their quarterly reports through Sept. 30 and includes money donated by these groups. Not shown: $1.1 million in in-kind help, mostly mail, that CTU and Our Schools PAC provided to candidates. SEIU expenditures were made through the committee Brighter Futures Chicago, which is entirely funded by SEIU.</div>
+        <div class="footer-note">Super PAC spending is independent spending only: ads and mail paid for by the groups, Jan. 2025 through Oct. 15. Candidates&rsquo; spending is from their quarterly reports through Sept. 30 and includes money donated by these groups. Not shown: $1.1 million in in-kind help, mostly mail, that CTU and Our Schools PAC provided to candidates. SEIU&rsquo;s ads were paid for by Brighter Futures Chicago, a committee funded entirely by SEIU.</div>
         Chart: Andrew Adams, Illinois Answers Project &middot; Source: Illinois Answers Project and Chalkbeat analysis of Illinois State Board of Elections records &middot; <a href="https://cdn.jsdelivr.net/gh/aadams-bga/schoolBoardMoney@main/outsideVsCandidates/outsideVsCandidates.csv" target="_blank" rel="noopener">Download the data</a>
     </footer>
 </div>
@@ -93,12 +93,12 @@
 <script>
 (function () {
 
-    const MAROON = "#8A2C38";
-    const MAROON_LIGHT = "#BE8A91";
-    const STEEL = "#53646D";
-    const STEEL_LIGHT = "#A3AFB5";
-    const AMBER = "#C06621";
-    const SAGE = "#353B32";
+    const RED = "#C0282F";
+    const BLUE = "#2B5DA8";
+    const GREEN = "#2E9A6E";
+    const GOLD = "#B8860B";
+    const ORCHID = "#C77DD6";
+    const CAND_GRAY = "#BDB6B2";
     const INK = "#1F161A";
     const NEUTRAL = "#8A827F";
     const GRAY_LIGHT = "#CBC4BE";
@@ -106,8 +106,8 @@
 
     // one color per group, the same in every graphic in this package
     const GROUP_COLOR = {
-        "Common Ground": MAROON, "INCS Action": STEEL, "Urban Center": MAROON_LIGHT, "SEIU": SAGE,
-        "CTU / Our Schools": AMBER, "Candidates' campaigns": NEUTRAL
+        "Common Ground": BLUE, "INCS Action": GREEN, "Urban Center": GOLD, "SEIU": ORCHID,
+        "CTU / Our Schools": RED, "Candidates' campaigns": CAND_GRAY
     };
 
     const container = d3.select("#chart-container");
@@ -209,7 +209,7 @@
 
         // candidates' own spending
         g.append("text").attr("class", "row-label").attr("x", 0).attr("y", y1 - 6).text("Candidates' campaigns");
-        g.append("rect").attr("x", 0).attr("y", y1).attr("width", x(cand.sep)).attr("height", barH).attr("fill", NEUTRAL)
+        g.append("rect").attr("x", 0).attr("y", y1).attr("width", x(cand.sep)).attr("height", barH).attr("fill", GROUP_COLOR["Candidates' campaigns"])
             .call(hover, () => '<div class="tooltip-header">Candidates\' campaigns</div>' + row("Spent, Jan. 2025 to Sept. 30, 2026", dollars(cand.sep)) +
                 '<div class="tooltip-note">October spending is not reported until Jan. 15.</div>', width, height);
         g.append("text").attr("class", "value-label").attr("x", x(cand.sep) + 6).attr("y", y1 + barH / 2).attr("dy", "0.32em").text(money(cand.sep));

@@ -83,17 +83,16 @@
     #map-panel .stack .lbl.own-none { min-width: 0; text-align: left; font-style: italic; color: #9A9195; }
     #map-panel .hint { color: #6E656A; font-size: 11px; margin-top: 8px; font-style: italic; }
     #chart-legend { flex-direction: column; align-items: flex-start; gap: 8px; }
-    .color-by-box { display: flex; flex-direction: column; gap: 4px; }
+    .color-by-box { display: flex; flex-direction: column; gap: 6px; margin-bottom: 4px; }
     .color-by { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
     .color-by .lbl { font-weight: 600; color: #1F161A; margin-right: 4px; }
     /* buttons are plain words in their group's color; the selected one is filled with that color, in bold */
-    .color-by button { font: inherit; font-size: 11.5px; padding: 3px 7px; border: 0; background: none; color: var(--c, #1F161A); cursor: pointer; border-radius: 2px; }
+    .color-by button { font: inherit; font-size: 11.5px; font-weight: 700; padding: 6px 7px; border: 0; background: none; color: var(--c, #1F161A); cursor: pointer; border-radius: 2px; }
     .color-by button:hover { text-decoration: underline; text-underline-offset: 2px; }
     .color-by button[aria-pressed="true"] { background: var(--c, #1F161A); color: #FFFFFF; font-weight: 700; text-decoration: none; }
     .color-by button:focus-visible { outline: 2px solid #1F161A; outline-offset: 1px; }
     .ramp { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #574F54; }
     .ramp .grad { width: 140px; height: 9px; border: 1px solid rgba(31, 22, 26, 0.18); }
-    .ramp .zero-swatch { width: 12px; height: 9px; border: 1px solid rgba(31, 22, 26, 0.18); }
     .district { stroke: #FFFFFF; stroke-width: 1px; cursor: pointer; }
     .district:focus { outline: none; }
     .district.active { stroke: #1F161A; stroke-width: 2px; }
@@ -122,7 +121,7 @@
     </div>
 
     <footer class="graph-footer">
-        <div class="footer-note">Each group&rsquo;s bars include its ads and its cash and in-kind donations to candidates. SEIU&rsquo;s spending is shown in two forms: ads paid for by Brighter Futures Chicago, a committee funded entirely by SEIU, and SEIU committees&rsquo; cash donations to campaigns. Campaigns&rsquo; own spending, in gray, may include money from those donations.</div>
+        <div class="footer-note">Each group&rsquo;s bars show its ads and its in-kind help to candidates. Cash donations to campaigns are not included in the groups&rsquo; bars; they are part of each campaign&rsquo;s own spending, in gray, once spent. SEIU&rsquo;s ads were paid for by Brighter Futures Chicago, a committee funded entirely by SEIU.</div>
         Chart: Andrew Adams, Illinois Answers Project &middot; Source: Illinois Answers Project and Chalkbeat analysis of Illinois State Board of Elections records &middot; <a href="https://cdn.jsdelivr.net/gh/aadams-bga/schoolBoardMoney@main/districtMap/districtMap.csv" target="_blank" rel="noopener">Download the data</a>
     </footer>
 </div>
@@ -130,12 +129,12 @@
 <script>
 (function () {
 
-    const MAROON = "#8A2C38";
-    const MAROON_LIGHT = "#BE8A91";
-    const STEEL = "#53646D";
-    const STEEL_LIGHT = "#A3AFB5";
-    const AMBER = "#C06621";
-    const SAGE = "#353B32";
+    const RED = "#C0282F";
+    const BLUE = "#2B5DA8";
+    const GREEN = "#2E9A6E";
+    const GOLD = "#B8860B";
+    const ORCHID = "#C77DD6";
+    const CAND_GRAY = "#BDB6B2";
     const INK = "#1F161A";
     const NEUTRAL = "#8A827F";
     const GRAY_LIGHT = "#CBC4BE";
@@ -143,8 +142,8 @@
 
     // one color per group, the same in every graphic in this package
     const GROUP_COLOR = {
-        "Common Ground": MAROON, "INCS Action": STEEL, "Urban Center": MAROON_LIGHT, "SEIU": SAGE,
-        "CTU / Our Schools": AMBER, "Candidates' campaigns": NEUTRAL
+        "Common Ground": BLUE, "INCS Action": GREEN, "Urban Center": GOLD, "SEIU": ORCHID,
+        "CTU / Our Schools": RED, "Candidates' campaigns": CAND_GRAY
     };
 
     const container = d3.select("#chart-container");
@@ -212,12 +211,15 @@
 
 
     const GROUPS = ["Common Ground", "INCS Action", "Urban Center", "CTU / Our Schools", "SEIU"];
-    const CAMP = "Campaign", CAMP_COLOR = "#8A827F";   // each candidate's own spending, shown beside the groups' money, never summed with it
+    const CAMP = "Campaign", CAMP_COLOR = CAND_GRAY;   // each candidate's own spending, shown beside the groups' money, never summed with it
     const NAME = g => g === "SEIU" ? "SEIU / Brighter Futures Chicago" : g;
     // first row: the two summary views; second row: one group at a time
     const MODE_ROWS = [[["Total", "Special interest groups"], [CAMP, "Candidates' own spending"]], GROUPS.map(g => [g, NAME(g)])];
-    const RAMP_END = Object.assign({ "Total": INK, [CAMP]: CAMP_COLOR }, GROUP_COLOR);
     const COLOR = Object.assign({ [CAMP]: CAMP_COLOR }, GROUP_COLOR);
+    // gold, orchid and the campaigns' gray are too pale for small text on white or for the dark end of a map ramp,
+    // so the buttons and the map shading use darker versions of them
+    const TEXT_COLOR = Object.assign({}, COLOR, { [CAMP]: "#6E656A", "Urban Center": "#8A6508", "SEIU": "#9A4FAE" });
+    const RAMP_END = Object.assign({ "Total": INK }, TEXT_COLOR);
     const isGroup = l => l.group !== CAMP;
     const ZERO = "#EEE9E4";
     let features = null, lines = null, mode = "Total", pinned = null, hovered = null, pointerFocus = false;
@@ -254,7 +256,7 @@
             // group buttons double as the legend: words in the group's color, filled with it when selected
             row.selectAll("button").data(modes).join("button").attr("type", "button")
                 .attr("aria-pressed", d => String(d[0] === mode))
-                .style("--c", d => COLOR[d[0]] || null)
+                .style("--c", d => TEXT_COLOR[d[0]] || null)
                 .text(d => d[1])
                 .on("click", function (event, d) {
                     mode = d[0];
@@ -284,9 +286,6 @@
         const fill = v => v > 0 ? color(v) : ZERO;
 
         const ramp = d3.select("#chart-legend .ramp").html("");
-        ramp.append("span").attr("class", "zero-swatch").style("background", ZERO);
-        ramp.append("span").text("No money");
-        ramp.append("span").style("width", "8px");
         ramp.append("span").text("$1");
         ramp.append("span").attr("class", "grad").style("background", "linear-gradient(to right, " + d3.range(0, 1.01, 0.1).map(t => color(t * t * max)).join(", ") + ")");
         ramp.append("span").text(money(max));
@@ -352,7 +351,7 @@
     }
 
     function candidateRows(rows, cands, showRace) {
-        // per candidate: money for (ads supporting + gifts) and ads against, split by group
+        // per candidate: money for (ads supporting + in-kind help) and ads against, split by group
         const data = cands.map(function (c) {
             const mine = rows.filter(l => l.candidate === c.name && l.race === c.race);
             const part = (g, against) => {

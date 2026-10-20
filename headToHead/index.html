@@ -73,9 +73,9 @@
 <div id="chart-container-wrapper">
 
     <h1>Chicago Teachers Union is outspent by anti-CTU groups in races around Chicago</h1>
-    <p class="subtitle">Groups like Common Ground Collective and INCS Action are spending heavily to defeat CTU-backed candidates. For incumbents like Norma Rios Sierra and Ed Bannon, special interest groups are outspending CTU by roughly 10-to-1 or more. For the most lopsided race, for incumbent Emma Lozano&rsquo;s seat, the CTU is being outspent by about 27-to-1.</p>
+    <p class="subtitle">Groups like Common Ground Collective and INCS Action are spending heavily to defeat CTU-backed candidates. For incumbents like Norma Rios Sierra and Anusha Thotakura, special interest groups are outspending CTU by more than 10-to-1. For the most lopsided race, for incumbent Emma Lozano&rsquo;s seat, the CTU is being outspent by about 25-to-1.</p>
 
-    <div id="chart-legend"><span class="legend-item"><span class="legend-swatch" style="background:#C06621;"></span>CTU / Our Schools</span><span class="legend-item"><span class="legend-swatch" style="background:#8A2C38;"></span>Common Ground</span><span class="legend-item"><span class="legend-swatch" style="background:#53646D;"></span>INCS Action</span><span class="legend-item"><span class="legend-swatch" style="background:#BE8A91;"></span>Urban Center</span><span class="legend-item"><span class="legend-swatch" style="background:#353B32;"></span>SEIU</span><span class="legend-item">&bull; Incumbent</span></div>
+    <div id="chart-legend"><span class="legend-item"><span class="legend-swatch" style="background:#C0282F;"></span>CTU / Our Schools</span><span class="legend-item"><span class="legend-swatch" style="background:#2B5DA8;"></span>Common Ground</span><span class="legend-item"><span class="legend-swatch" style="background:#2E9A6E;"></span>INCS Action</span><span class="legend-item"><span class="legend-swatch" style="background:#B8860B;"></span>Urban Center</span><span class="legend-item"><span class="legend-swatch" style="background:#C77DD6;"></span>SEIU</span><span class="legend-item">&bull; Incumbent</span></div>
 
     <div id="chart-wrapper" style="position: relative;">
         <div id="chart-container">
@@ -85,7 +85,7 @@
     </div>
 
     <footer class="graph-footer">
-        <div class="footer-note">CTU and the affiliated political action committee Our Schools PAC structure most of their support as in-kind help to candidate committees. Common Ground and INCS rely on independent expenditure committees, which are barred from coordinating with campaigns. Other groups employ both strategies. Each total includes a group&rsquo;s ads and its cash and in-kind donations to candidates. SEIU&rsquo;s includes ads by Brighter Futures Chicago, a committee funded entirely by SEIU, and SEIU committees&rsquo; donations.</div>
+        <div class="footer-note">CTU and the affiliated political action committee Our Schools PAC structure most of their support as in-kind help to candidate committees. Common Ground and INCS rely on independent expenditure committees, which are barred from coordinating with campaigns. Other groups employ both strategies. Each total is a group&rsquo;s ads plus its in-kind help to candidates. Cash donations to campaigns are not included. SEIU&rsquo;s ads were paid for by Brighter Futures Chicago, a committee funded entirely by SEIU.</div>
         Chart: Andrew Adams, Illinois Answers Project &middot; Source: Illinois Answers Project and Chalkbeat analysis of Illinois State Board of Elections records &middot; <a href="https://cdn.jsdelivr.net/gh/aadams-bga/schoolBoardMoney@main/headToHead/headToHead.csv" target="_blank" rel="noopener">Download the data</a>
     </footer>
 </div>
@@ -93,12 +93,12 @@
 <script>
 (function () {
 
-    const MAROON = "#8A2C38";
-    const MAROON_LIGHT = "#BE8A91";
-    const STEEL = "#53646D";
-    const STEEL_LIGHT = "#A3AFB5";
-    const AMBER = "#C06621";
-    const SAGE = "#353B32";
+    const RED = "#C0282F";
+    const BLUE = "#2B5DA8";
+    const GREEN = "#2E9A6E";
+    const GOLD = "#B8860B";
+    const ORCHID = "#C77DD6";
+    const CAND_GRAY = "#BDB6B2";
     const INK = "#1F161A";
     const NEUTRAL = "#8A827F";
     const GRAY_LIGHT = "#CBC4BE";
@@ -106,8 +106,8 @@
 
     // one color per group, the same in every graphic in this package
     const GROUP_COLOR = {
-        "Common Ground": MAROON, "INCS Action": STEEL, "Urban Center": MAROON_LIGHT, "SEIU": SAGE,
-        "CTU / Our Schools": AMBER, "Candidates' campaigns": NEUTRAL
+        "Common Ground": BLUE, "INCS Action": GREEN, "Urban Center": GOLD, "SEIU": ORCHID,
+        "CTU / Our Schools": RED, "Candidates' campaigns": CAND_GRAY
     };
 
     const container = d3.select("#chart-container");
@@ -181,7 +181,7 @@
         const r = {
             race: d.race, ctu: d.ctu_candidate, ctuInc: d.ctu_incumbent === "1", reform: d.reform_candidate, reformInc: d.reform_incumbent === "1",
             ctuTotal: num(d["CTU / Our Schools"]) || 0, adsFor: num(d["Ads for reform candidate"]) || 0,
-            adsAgainst: num(d["Ads against CTU candidate"]) || 0, gifts: num(d["Gifts to reform candidate"]) || 0
+            adsAgainst: num(d["Ads against CTU candidate"]) || 0, inkind: num(d["In-kind help to reform candidate"]) || 0
         };
         r.groups = ORDER.map(name => ({ name: name, value: num(d[name]) || 0 })).filter(s => s.value > 0);
         r.reformTotal = d3.sum(r.groups, s => s.value);
@@ -232,7 +232,7 @@
             .text(d => lastName(d.reform) + (d.reformInc ? " •" : ""));
 
         rows.append("rect").attr("x", d => mid - 1 - Math.max(2, d.ctuTotal * k)).attr("y", by).attr("height", barH)
-            .attr("width", d => Math.max(2, d.ctuTotal * k)).attr("fill", AMBER);
+            .attr("width", d => Math.max(2, d.ctuTotal * k)).attr("fill", GROUP_COLOR["CTU / Our Schools"]);
         rows.append("text").attr("class", "value-label").attr("x", d => mid - 5 - Math.max(2, d.ctuTotal * k)).attr("y", by + barH / 2)
             .attr("dy", "0.32em").attr("text-anchor", "end").text(d => money(d.ctuTotal));
 
@@ -251,10 +251,10 @@
         // whole-row hover target
         rows.append("rect").attr("x", 0).attr("y", 0).attr("width", width).attr("height", rowH - 2).attr("fill", "transparent")
             .call(hover, d => '<div class="tooltip-header">Subdistrict ' + esc(d.race) + "</div>" +
-                row(d.ctu + (d.ctuInc ? " (inc.)" : "") + ": CTU / Our Schools", dollars(d.ctuTotal), AMBER) +
+                row(d.ctu + (d.ctuInc ? " (inc.)" : "") + ": CTU / Our Schools", dollars(d.ctuTotal), GROUP_COLOR["CTU / Our Schools"]) +
                 d.groups.map(s => row(s.name, dollars(s.value), GROUP_COLOR[s.name])).join("") +
                 '<div class="tooltip-note" style="margin-top:4px">For ' + esc(d.reform) + (d.reformInc ? " (inc.)" : "") + ": " +
-                "ads for " + money(d.adsFor) + ", ads against " + esc(lastName(d.ctu)) + " " + money(d.adsAgainst) + ", gifts " + money(d.gifts) + "</div>", width, height);
+                "ads for " + money(d.adsFor) + ", ads against " + esc(lastName(d.ctu)) + " " + money(d.adsAgainst) + ", in-kind help " + money(d.inkind) + "</div>", width, height);
     }
 
 

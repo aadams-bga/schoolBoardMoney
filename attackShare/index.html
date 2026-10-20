@@ -75,7 +75,7 @@
     <h1>Common Ground spends more money on attack ads than other groups</h1>
     <p class="subtitle">The bulk of Common Ground&rsquo;s attack ads have been directed against CTU-backed candidate for board president Hilario Dominguez. Other groups direct most or all of their support as support ads for candidates.</p>
 
-    <div id="chart-legend"><span class="legend-item"><span class="legend-swatch" style="background:#8A2C38;"></span>Common Ground</span><span class="legend-item"><span class="legend-swatch" style="background:#53646D;"></span>INCS Action</span><span class="legend-item"><span class="legend-swatch" style="background:#BE8A91;"></span>Urban Center</span><span class="legend-item"><span class="legend-swatch" style="background:#353B32;"></span>SEIU</span><span class="legend-item"><span class="legend-swatch" style="background:#8A827F;"></span>Opposing (solid)</span><span class="legend-item"><span class="legend-swatch" style="background:rgba(138,130,127,0.45);"></span>Supporting (light)</span></div>
+    <div id="chart-legend"><span class="legend-item"><span class="legend-swatch" style="background:#2B5DA8;"></span>Common Ground</span><span class="legend-item"><span class="legend-swatch" style="background:#2E9A6E;"></span>INCS Action</span><span class="legend-item"><span class="legend-swatch" style="background:#B8860B;"></span>Urban Center</span><span class="legend-item"><span class="legend-swatch" style="background:#C77DD6;"></span>SEIU</span><span class="legend-item"><span class="legend-swatch" style="background:rgba(138,130,127,0.45);"></span>Opposing (light)</span><span class="legend-item"><span class="legend-swatch" style="background:#8A827F;"></span>Supporting (solid)</span></div>
 
     <div id="chart-wrapper" style="position: relative;">
         <div id="chart-container">
@@ -85,7 +85,7 @@
     </div>
 
     <footer class="graph-footer">
-        <div class="footer-note">Independent spending only: ads and mail paid for by the groups, Jan. 2025 through Oct. 15. Donations to candidates are not included. SEIU expenditures were made through the committee Brighter Futures Chicago, which is entirely funded by SEIU.</div>
+        <div class="footer-note">Independent spending only: ads and mail paid for by the groups, Jan. 2025 through Oct. 15. Donations to candidates are not included. SEIU&rsquo;s ads were paid for by Brighter Futures Chicago, a committee funded entirely by SEIU.</div>
         Chart: Andrew Adams, Illinois Answers Project &middot; Source: Illinois Answers Project and Chalkbeat analysis of Illinois State Board of Elections records &middot; <a href="https://cdn.jsdelivr.net/gh/aadams-bga/schoolBoardMoney@main/attackShare/attackShare.csv" target="_blank" rel="noopener">Download the data</a>
     </footer>
 </div>
@@ -93,12 +93,12 @@
 <script>
 (function () {
 
-    const MAROON = "#8A2C38";
-    const MAROON_LIGHT = "#BE8A91";
-    const STEEL = "#53646D";
-    const STEEL_LIGHT = "#A3AFB5";
-    const AMBER = "#C06621";
-    const SAGE = "#353B32";
+    const RED = "#C0282F";
+    const BLUE = "#2B5DA8";
+    const GREEN = "#2E9A6E";
+    const GOLD = "#B8860B";
+    const ORCHID = "#C77DD6";
+    const CAND_GRAY = "#BDB6B2";
     const INK = "#1F161A";
     const NEUTRAL = "#8A827F";
     const GRAY_LIGHT = "#CBC4BE";
@@ -106,8 +106,8 @@
 
     // one color per group, the same in every graphic in this package
     const GROUP_COLOR = {
-        "Common Ground": MAROON, "INCS Action": STEEL, "Urban Center": MAROON_LIGHT, "SEIU": SAGE,
-        "CTU / Our Schools": AMBER, "Candidates' campaigns": NEUTRAL
+        "Common Ground": BLUE, "INCS Action": GREEN, "Urban Center": GOLD, "SEIU": ORCHID,
+        "CTU / Our Schools": RED, "Candidates' campaigns": CAND_GRAY
     };
 
     const container = d3.select("#chart-container");
@@ -208,11 +208,11 @@
                 row("Opposing a candidate", dollars(d.opposing)) +
                 row("Supporting a candidate", dollars(d.supporting));
             if (d.opposing > 0) {
-                svg.append("rect").attr("x", mid - 1 - d.opposing * k).attr("y", y).attr("width", d.opposing * k).attr("height", barH).attr("fill", c).call(hover, tip, width, height);
+                svg.append("rect").attr("x", mid - 1 - d.opposing * k).attr("y", y).attr("width", d.opposing * k).attr("height", barH).attr("fill", c).attr("fill-opacity", 0.45).call(hover, tip, width, height);
                 svg.append("text").attr("class", "value-label").attr("x", mid - 5 - d.opposing * k).attr("y", y + barH / 2).attr("dy", "0.32em").attr("text-anchor", "end")
                     .text(money(d.opposing));
             }
-            svg.append("rect").attr("x", mid + 1).attr("y", y).attr("width", d.supporting * k).attr("height", barH).attr("fill", c).attr("fill-opacity", 0.45)
+            svg.append("rect").attr("x", mid + 1).attr("y", y).attr("width", d.supporting * k).attr("height", barH).attr("fill", c)
                 .call(hover, tip, width, height);
             svg.append("text").attr("class", "value-label").attr("x", mid + 5 + d.supporting * k).attr("y", y + barH / 2).attr("dy", "0.32em")
                 .text(money(d.supporting));

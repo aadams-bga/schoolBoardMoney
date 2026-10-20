@@ -75,7 +75,7 @@
     <h1>Lorem ipsum dolor sit amet, consectetur adipiscing elit</h1>
     <p class="subtitle">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
 
-    <div id="chart-legend"><span class="legend-item"><span class="legend-swatch" style="background:#B9B0AB;"></span>All other donors</span><span class="legend-item"><span class="legend-swatch" style="background:#8A827F;background-image:repeating-linear-gradient(45deg, #8A827F 0 2px, transparent 2px 5px);background-color:transparent"></span>Loans</span><span class="legend-item"><span class="legend-swatch" style="background:#C06621;"></span>CTU / Our Schools</span><span class="legend-item"><span class="legend-swatch" style="background:#353B32;"></span>SEIU</span><span class="legend-item"><span class="legend-swatch" style="background:#8A2C38;"></span>Common Ground</span><span class="legend-item"><span class="legend-swatch" style="background:#53646D;"></span>INCS Action</span><span class="legend-item"><span class="legend-swatch" style="background:#BE8A91;"></span>Urban Center</span><span class="legend-item">* Incumbent</span></div>
+    <div id="chart-legend"><span class="legend-item"><span class="legend-swatch" style="background:#B9B0AB;"></span>All other donors</span><span class="legend-item"><span class="legend-swatch" style="background:#8A827F;background-image:repeating-linear-gradient(45deg, #8A827F 0 2px, transparent 2px 5px);background-color:transparent"></span>Loans</span><span class="legend-item"><span class="legend-swatch" style="background:#C0282F;"></span>CTU / Our Schools</span><span class="legend-item"><span class="legend-swatch" style="background:#C77DD6;"></span>SEIU</span><span class="legend-item"><span class="legend-swatch" style="background:#2B5DA8;"></span>Common Ground</span><span class="legend-item"><span class="legend-swatch" style="background:#2E9A6E;"></span>INCS Action</span><span class="legend-item"><span class="legend-swatch" style="background:#B8860B;"></span>Urban Center</span><span class="legend-item">* Incumbent</span></div>
 
     <div id="chart-wrapper" style="position: relative;">
         <div id="chart-container">
@@ -93,12 +93,12 @@
 <script>
 (function () {
 
-    const MAROON = "#8A2C38";
-    const MAROON_LIGHT = "#BE8A91";
-    const STEEL = "#53646D";
-    const STEEL_LIGHT = "#A3AFB5";
-    const AMBER = "#C06621";
-    const SAGE = "#353B32";
+    const RED = "#C0282F";
+    const BLUE = "#2B5DA8";
+    const GREEN = "#2E9A6E";
+    const GOLD = "#B8860B";
+    const ORCHID = "#C77DD6";
+    const CAND_GRAY = "#BDB6B2";
     const INK = "#1F161A";
     const NEUTRAL = "#8A827F";
     const GRAY_LIGHT = "#CBC4BE";
@@ -106,8 +106,8 @@
 
     // one color per group, the same in every graphic in this package
     const GROUP_COLOR = {
-        "Common Ground": MAROON, "INCS Action": STEEL, "Urban Center": MAROON_LIGHT, "SEIU": SAGE,
-        "CTU / Our Schools": AMBER, "Candidates' campaigns": NEUTRAL
+        "Common Ground": BLUE, "INCS Action": GREEN, "Urban Center": GOLD, "SEIU": ORCHID,
+        "CTU / Our Schools": RED, "Candidates' campaigns": CAND_GRAY
     };
 
     const container = d3.select("#chart-container");

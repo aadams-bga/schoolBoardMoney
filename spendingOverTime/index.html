@@ -75,7 +75,7 @@
     <h1>Campaign spending exploded in October as campaigns enter final weeks</h1>
     <p class="subtitle">More than one quarter of all campaign spending has been in the past three weeks, according to disclosures with state election authorities. The bulk of this spending has been from a few special interest groups.</p>
 
-    <div id="chart-legend"><span class="legend-item"><span class="legend-swatch" style="background:#8A2C38;"></span>Common Ground</span><span class="legend-item"><span class="legend-swatch" style="background:#53646D;"></span>INCS Action</span><span class="legend-item"><span class="legend-swatch" style="background:#BE8A91;"></span>Urban Center</span><span class="legend-item"><span class="legend-swatch" style="background:#353B32;"></span>SEIU</span><span class="legend-item"><span class="legend-swatch" style="background:#C06621;"></span>CTU / Our Schools (in-kind help)</span><span class="legend-item"><span class="legend-swatch" style="background:#8A827F;"></span>Candidates' campaigns</span><span class="legend-item"><span class="legend-swatch" style="background:#8A827F;background-image:repeating-linear-gradient(45deg, #8A827F 0 2px, transparent 2px 5px);background-color:transparent"></span>Candidates, not yet reported</span></div>
+    <div id="chart-legend"><span class="legend-item"><span class="legend-swatch" style="background:#2B5DA8;"></span>Common Ground</span><span class="legend-item"><span class="legend-swatch" style="background:#2E9A6E;"></span>INCS Action</span><span class="legend-item"><span class="legend-swatch" style="background:#B8860B;"></span>Urban Center</span><span class="legend-item"><span class="legend-swatch" style="background:#C77DD6;"></span>SEIU</span><span class="legend-item"><span class="legend-swatch" style="background:#C0282F;"></span>CTU / Our Schools (in-kind help)</span><span class="legend-item"><span class="legend-swatch" style="background:#BDB6B2;"></span>Candidates' campaigns</span><span class="legend-item"><span class="legend-swatch" style="background:#BDB6B2;background-image:repeating-linear-gradient(45deg, #BDB6B2 0 2px, transparent 2px 5px);background-color:transparent"></span>Candidates, not yet reported</span></div>
 
     <div id="chart-wrapper" style="position: relative;">
         <div id="chart-container">
@@ -85,7 +85,7 @@
     </div>
 
     <footer class="graph-footer">
-        <div class="footer-note">Each group&rsquo;s spending is its ads and mail plus in-kind help to campaigns, on the date reported. Cash donations to campaigns are counted when the campaigns spend them, in candidates&rsquo; spending, which is reported through Sept. 30. SEIU&rsquo;s ads were paid for by the committee Brighter Futures Chicago, which is entirely funded by SEIU.</div>
+        <div class="footer-note">Each group&rsquo;s spending is its ads and mail plus in-kind help to campaigns, on the date reported. Cash donations to campaigns are counted when the campaigns spend them, in candidates&rsquo; spending, which is reported through Sept. 30. SEIU&rsquo;s ads were paid for by Brighter Futures Chicago, a committee funded entirely by SEIU.</div>
         Chart: Andrew Adams, Illinois Answers Project &middot; Source: Illinois Answers Project and Chalkbeat analysis of Illinois State Board of Elections records &middot; <a href="https://cdn.jsdelivr.net/gh/aadams-bga/schoolBoardMoney@main/spendingOverTime/spendingOverTime.csv" target="_blank" rel="noopener">Download the data</a>
     </footer>
 </div>
@@ -93,12 +93,12 @@
 <script>
 (function () {
 
-    const MAROON = "#8A2C38";
-    const MAROON_LIGHT = "#BE8A91";
-    const STEEL = "#53646D";
-    const STEEL_LIGHT = "#A3AFB5";
-    const AMBER = "#C06621";
-    const SAGE = "#353B32";
+    const RED = "#C0282F";
+    const BLUE = "#2B5DA8";
+    const GREEN = "#2E9A6E";
+    const GOLD = "#B8860B";
+    const ORCHID = "#C77DD6";
+    const CAND_GRAY = "#BDB6B2";
     const INK = "#1F161A";
     const NEUTRAL = "#8A827F";
     const GRAY_LIGHT = "#CBC4BE";
@@ -106,8 +106,8 @@
 
     // one color per group, the same in every graphic in this package
     const GROUP_COLOR = {
-        "Common Ground": MAROON, "INCS Action": STEEL, "Urban Center": MAROON_LIGHT, "SEIU": SAGE,
-        "CTU / Our Schools": AMBER, "Candidates' campaigns": NEUTRAL
+        "Common Ground": BLUE, "INCS Action": GREEN, "Urban Center": GOLD, "SEIU": ORCHID,
+        "CTU / Our Schools": RED, "Candidates' campaigns": CAND_GRAY
     };
 
     const container = d3.select("#chart-container");
