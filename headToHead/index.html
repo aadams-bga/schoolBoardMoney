@@ -47,10 +47,10 @@
         box-shadow: 3px 3px 0 rgba(31, 22, 26, 0.12); padding: 8px 11px; font-size: 12px; color: #1F161A; z-index: 100; line-height: 1.45; max-width: 260px;
     }
     #chart-tooltip .tooltip-header { font-weight: 700; margin-bottom: 4px; }
-    #chart-tooltip .tooltip-row { display: flex; align-items: baseline; gap: 6px; white-space: nowrap; }
+    #chart-tooltip .tooltip-row { display: flex; align-items: baseline; gap: 6px; }
     #chart-tooltip .tooltip-swatch { width: 8px; height: 8px; flex: 0 0 auto; }
-    #chart-tooltip .tooltip-name { color: #574F54; }
-    #chart-tooltip .tooltip-value { font-weight: 700; margin-left: auto; padding-left: 10px; }
+    #chart-tooltip .tooltip-name { color: #574F54; min-width: 0; }
+    #chart-tooltip .tooltip-value { font-weight: 700; margin-left: auto; padding-left: 10px; white-space: nowrap; flex: 0 0 auto; }
     #chart-tooltip .tooltip-note { color: #574F54; white-space: normal; }
     .graph-footer { margin-top: 22px; padding-top: 12px; border-top: 1px solid #DCD4CE; font-size: 11px; color: #6E656A; line-height: 1.4; position: relative; z-index: 1; }
     .graph-footer a { color: inherit; text-decoration: underline; }
@@ -75,7 +75,7 @@
     <h1>Chicago Teachers Union is outspent by anti-CTU groups in races around Chicago</h1>
     <p class="subtitle">Groups like Common Ground Collective and INCS Action are spending heavily to defeat CTU-backed candidates. For incumbents like Norma Rios Sierra and Anusha Thotakura, special interest groups are outspending CTU by more than 10-to-1. For the most lopsided race, for incumbent Emma Lozano&rsquo;s seat, the CTU is being outspent by about 25-to-1.</p>
 
-    <div id="chart-legend"><span class="legend-item"><span class="legend-swatch" style="background:#C0282F;"></span>CTU / Our Schools</span><span class="legend-item"><span class="legend-swatch" style="background:#2B5DA8;"></span>Common Ground</span><span class="legend-item"><span class="legend-swatch" style="background:#2E9A6E;"></span>INCS Action</span><span class="legend-item"><span class="legend-swatch" style="background:#B8860B;"></span>Urban Center</span><span class="legend-item"><span class="legend-swatch" style="background:#C77DD6;"></span>SEIU</span><span class="legend-item">&bull; Incumbent</span></div>
+    <div id="chart-legend"><span class="legend-item"><span class="legend-swatch" style="background:#C0282F;"></span>CTU / Our Schools</span><span class="legend-item"><span class="legend-swatch" style="background:#2B5DA8;"></span>Common Ground</span><span class="legend-item"><span class="legend-swatch" style="background:#2E9A6E;"></span>INCS Action</span><span class="legend-item"><span class="legend-swatch" style="background:#B8860B;"></span>Urban Center</span><span class="legend-item"><span class="legend-swatch" style="background:#C77DD6;"></span>SEIU / Brighter Futures Chicago</span><span class="legend-item">&bull; Incumbent</span></div>
 
     <div id="chart-wrapper" style="position: relative;">
         <div id="chart-container">
@@ -85,7 +85,7 @@
     </div>
 
     <footer class="graph-footer">
-        <div class="footer-note">CTU and the affiliated political action committee Our Schools PAC structure most of their support as in-kind help to candidate committees. Common Ground and INCS rely on independent expenditure committees, which are barred from coordinating with campaigns. Other groups employ both strategies. Each total is a group&rsquo;s ads plus its in-kind help to candidates. Cash donations to campaigns are not included. SEIU&rsquo;s ads were paid for by Brighter Futures Chicago, a committee funded entirely by SEIU.</div>
+        <div class="footer-note">CTU and the affiliated political action committee Our Schools PAC structure most of their support as in-kind help to candidate committees. Common Ground and INCS rely mostly on independent expenditure committees, which are barred from coordinating with campaigns. Other groups employ both strategies.</div>
         Chart: Andrew Adams, Illinois Answers Project &middot; Source: Illinois Answers Project and Chalkbeat analysis of Illinois State Board of Elections records &middot; <a href="https://cdn.jsdelivr.net/gh/aadams-bga/schoolBoardMoney@main/headToHead/headToHead.csv" target="_blank" rel="noopener">Download the data</a>
     </footer>
 </div>

@@ -47,10 +47,10 @@
         box-shadow: 3px 3px 0 rgba(31, 22, 26, 0.12); padding: 8px 11px; font-size: 12px; color: #1F161A; z-index: 100; line-height: 1.45; max-width: 260px;
     }
     #chart-tooltip .tooltip-header { font-weight: 700; margin-bottom: 4px; }
-    #chart-tooltip .tooltip-row { display: flex; align-items: baseline; gap: 6px; white-space: nowrap; }
+    #chart-tooltip .tooltip-row { display: flex; align-items: baseline; gap: 6px; }
     #chart-tooltip .tooltip-swatch { width: 8px; height: 8px; flex: 0 0 auto; }
-    #chart-tooltip .tooltip-name { color: #574F54; }
-    #chart-tooltip .tooltip-value { font-weight: 700; margin-left: auto; padding-left: 10px; }
+    #chart-tooltip .tooltip-name { color: #574F54; min-width: 0; }
+    #chart-tooltip .tooltip-value { font-weight: 700; margin-left: auto; padding-left: 10px; white-space: nowrap; flex: 0 0 auto; }
     #chart-tooltip .tooltip-note { color: #574F54; white-space: normal; }
     .graph-footer { margin-top: 22px; padding-top: 12px; border-top: 1px solid #DCD4CE; font-size: 11px; color: #6E656A; line-height: 1.4; position: relative; z-index: 1; }
     .graph-footer a { color: inherit; text-decoration: underline; }
@@ -121,7 +121,7 @@
     </div>
 
     <footer class="graph-footer">
-        <div class="footer-note">Each group&rsquo;s bars show its ads and its in-kind help to candidates. Cash donations to campaigns are not included in the groups&rsquo; bars; they are part of each campaign&rsquo;s own spending, in gray, once spent. SEIU&rsquo;s ads were paid for by Brighter Futures Chicago, a committee funded entirely by SEIU.</div>
+        <div class="footer-note">Groups&rsquo; spending reflects independent expenditures and in-kind donations. Cash donations and committee transfers are only counted as candidate spending after candidates report. Candidates have reported spending through Sept. 30.</div>
         Chart: Andrew Adams, Illinois Answers Project &middot; Source: Illinois Answers Project and Chalkbeat analysis of Illinois State Board of Elections records &middot; <a href="https://cdn.jsdelivr.net/gh/aadams-bga/schoolBoardMoney@main/districtMap/districtMap.csv" target="_blank" rel="noopener">Download the data</a>
     </footer>
 </div>
@@ -402,7 +402,8 @@
         const height = d3.select("#chart-wrapper").node().getBoundingClientRect().height;
         panel.selectAll(".track span").each(function () {
             const t = JSON.parse(this.getAttribute("data-tip"));
-            d3.select(this).datum(t).call(hover, d => '<div class="tooltip-header">' + esc(NAME(d.g)) + "</div>" + d.rows.map(r => row(r[0] + (d.c ? " " + d.c : ""), dollars(r[1]))).join(""), width, height);
+            d3.select(this).datum(t).call(hover, d => '<div class="tooltip-header">' + esc(NAME(d.g)) + "</div>" +
+                (d.c ? '<div class="tooltip-note" style="margin:-2px 0 3px">' + esc(d.c) + "</div>" : "") + d.rows.map(r => row(r[0], dollars(r[1]))).join(""), width, height);
         });
     }
 

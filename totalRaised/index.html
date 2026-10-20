@@ -47,10 +47,10 @@
         box-shadow: 3px 3px 0 rgba(31, 22, 26, 0.12); padding: 8px 11px; font-size: 12px; color: #1F161A; z-index: 100; line-height: 1.45; max-width: 260px;
     }
     #chart-tooltip .tooltip-header { font-weight: 700; margin-bottom: 4px; }
-    #chart-tooltip .tooltip-row { display: flex; align-items: baseline; gap: 6px; white-space: nowrap; }
+    #chart-tooltip .tooltip-row { display: flex; align-items: baseline; gap: 6px; }
     #chart-tooltip .tooltip-swatch { width: 8px; height: 8px; flex: 0 0 auto; }
-    #chart-tooltip .tooltip-name { color: #574F54; }
-    #chart-tooltip .tooltip-value { font-weight: 700; margin-left: auto; padding-left: 10px; }
+    #chart-tooltip .tooltip-name { color: #574F54; min-width: 0; }
+    #chart-tooltip .tooltip-value { font-weight: 700; margin-left: auto; padding-left: 10px; white-space: nowrap; flex: 0 0 auto; }
     #chart-tooltip .tooltip-note { color: #574F54; white-space: normal; }
     .graph-footer { margin-top: 22px; padding-top: 12px; border-top: 1px solid #DCD4CE; font-size: 11px; color: #6E656A; line-height: 1.4; position: relative; z-index: 1; }
     .graph-footer a { color: inherit; text-decoration: underline; }
@@ -75,7 +75,7 @@
     <h1>Lorem ipsum dolor sit amet, consectetur adipiscing elit</h1>
     <p class="subtitle">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
 
-    <div id="chart-legend"><span class="legend-item"><span class="legend-swatch" style="background:#B9B0AB;"></span>All other donors</span><span class="legend-item"><span class="legend-swatch" style="background:#8A827F;background-image:repeating-linear-gradient(45deg, #8A827F 0 2px, transparent 2px 5px);background-color:transparent"></span>Loans</span><span class="legend-item"><span class="legend-swatch" style="background:#C0282F;"></span>CTU / Our Schools</span><span class="legend-item"><span class="legend-swatch" style="background:#C77DD6;"></span>SEIU</span><span class="legend-item"><span class="legend-swatch" style="background:#2B5DA8;"></span>Common Ground</span><span class="legend-item"><span class="legend-swatch" style="background:#2E9A6E;"></span>INCS Action</span><span class="legend-item"><span class="legend-swatch" style="background:#B8860B;"></span>Urban Center</span><span class="legend-item">* Incumbent</span></div>
+    <div id="chart-legend"><span class="legend-item"><span class="legend-swatch" style="background:#B9B0AB;"></span>All other donors</span><span class="legend-item"><span class="legend-swatch" style="background:#8A827F;background-image:repeating-linear-gradient(45deg, #8A827F 0 2px, transparent 2px 5px);background-color:transparent"></span>Loans</span><span class="legend-item"><span class="legend-swatch" style="background:#C0282F;"></span>CTU / Our Schools</span><span class="legend-item"><span class="legend-swatch" style="background:#C77DD6;"></span>SEIU / Brighter Futures Chicago</span><span class="legend-item"><span class="legend-swatch" style="background:#2B5DA8;"></span>Common Ground</span><span class="legend-item"><span class="legend-swatch" style="background:#2E9A6E;"></span>INCS Action</span><span class="legend-item"><span class="legend-swatch" style="background:#B8860B;"></span>Urban Center</span><span class="legend-item">* Incumbent</span></div>
 
     <div id="chart-wrapper" style="position: relative;">
         <div id="chart-container">
