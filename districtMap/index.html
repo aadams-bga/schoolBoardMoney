@@ -347,7 +347,7 @@
         if (!total) return "";
         return "<div class='stack'><div class='track'>" + parts.filter(p => p.v > 0).map(p =>
             "<span data-tip='" + esc(JSON.stringify(p.tip)).replace(/'/g, "&#39;") + "' style='width:" + (100 * p.v / scale) + "%;background:" + (against === true ? STRIPE(COLOR[p.g]) : COLOR[p.g]) + "'></span>").join("") +
-            "</div><span class='lbl'>" + (against === "own" ? "own " : against ? "against " : "") + money(total) + "</span></div>";
+            "</div><span class='lbl'>" + (against === "own" ? "own " : against ? "against " : "for ") + money(total) + "</span></div>";
     }
 
     function candidateRows(rows, cands, showRace) {
