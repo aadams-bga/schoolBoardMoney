@@ -202,16 +202,12 @@
         data.forEach(function (d, i) {
             const y = top + i * (barH + rowGap), c = GROUP_COLOR[d.group];
             svg.append("text").attr("class", "row-label").attr("x", 0).attr("y", y + barH / 2).attr("dy", "0.32em").text(d.group);
-            const tip = () => '<div class="tooltip-header">' + esc(d.group) + "</div>" +
-                row("Opposing a candidate", dollars(d.opposing)) +
-                row("Supporting a candidate", dollars(d.supporting));
             if (d.opposing > 0) {
-                svg.append("rect").attr("x", mid - 1 - d.opposing * k).attr("y", y).attr("width", d.opposing * k).attr("height", barH).attr("fill", c).attr("fill-opacity", 0.45).call(hover, tip, width, height);
+                svg.append("rect").attr("x", mid - 1 - d.opposing * k).attr("y", y).attr("width", d.opposing * k).attr("height", barH).attr("fill", c).attr("fill-opacity", 0.45);
                 svg.append("text").attr("class", "value-label").attr("x", mid - 5 - d.opposing * k).attr("y", y + barH / 2).attr("dy", "0.32em").attr("text-anchor", "end")
                     .text(money(d.opposing));
             }
-            svg.append("rect").attr("x", mid + 1).attr("y", y).attr("width", d.supporting * k).attr("height", barH).attr("fill", c)
-                .call(hover, tip, width, height);
+            svg.append("rect").attr("x", mid + 1).attr("y", y).attr("width", d.supporting * k).attr("height", barH).attr("fill", c);
             svg.append("text").attr("class", "value-label").attr("x", mid + 5 + d.supporting * k).attr("y", y + barH / 2).attr("dy", "0.32em")
                 .text(money(d.supporting));
         });

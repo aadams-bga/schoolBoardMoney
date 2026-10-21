@@ -258,11 +258,12 @@
         g.append("text").attr("class", "note-label halo").attr("x", x(candEnd) - 5).attr("y", 8).attr("text-anchor", "end").text("Candidates' reports end Sept. 30");
 
         const rule = g.append("line").attr("class", "marker-rule").attr("y1", 0).attr("y2", ih).style("display", "none");
-        const bis = d3.bisector(d => d.date).right;
-        g.append("rect").attr("width", x(lastDate)).attr("height", ih).attr("fill", "transparent").classed("hit", true)
+        const bis = d3.bisector(d => d.date).left;
+        g.append("rect").attr("width", iw).attr("height", ih).attr("fill", "transparent").classed("hit", true)
             .on("mouseenter mousemove", function (event) {
                 const [mx] = d3.pointer(event, this);
-                const d = data[Math.max(0, bis(data, x.invert(mx)) - 1)];
+                const t = x.invert(mx), i = Math.min(bis(data, t), data.length - 1);
+                const d = i > 0 && t - data[i - 1].date < data[i].date - t ? data[i - 1] : data[i];
                 rule.style("display", null).attr("x1", x(d.date)).attr("x2", x(d.date));
                 let html = '<div class="tooltip-header">Total spent by ' + fmtDay(d.date) + "</div>";
                 SERIES.slice().reverse().forEach(function (s) {

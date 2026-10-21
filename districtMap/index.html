@@ -370,7 +370,7 @@
             const f = features.find(x => x.properties.race === race);
             html += candidateRows(all, f.properties.candidates.map(c => ({ name: c.name, incumbent: c.incumbent, writeIn: c.write_in, race: race })), false);
         } else {
-            const top = features.slice().sort((a, b) => amountFor(b.properties.race, "Total") - amountFor(a.properties.race, "Total")).slice(0, 5);
+            const top = features.slice().sort((a, b) => amountFor(b.properties.race, "Total") - amountFor(a.properties.race, "Total")).slice(0, 3);
             const candsOf = f => f.properties.candidates.map(c => ({ name: c.name, incumbent: c.incumbent, writeIn: c.write_in, race: f.properties.race }));
             const scale = d3.max(top.flatMap(candsOf), c => {
                 const mine = lines.filter(l => l.candidate === c.name && l.race === c.race);
