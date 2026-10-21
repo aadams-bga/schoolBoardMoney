@@ -20,12 +20,3 @@ window.addEventListener("message", function (e) {
 });
 </script>
 ```
-
-**Chalkbeat (Sidechain)**
-
-```html
-<side-chain src="https://aadams-bga.github.io/schoolBoardMoney/headToHead/"></side-chain>
-<side-chain src="https://aadams-bga.github.io/schoolBoardMoney/attackShare/"></side-chain>
-<side-chain src="https://aadams-bga.github.io/schoolBoardMoney/spendingOverTime/"></side-chain>
-<side-chain src="https://aadams-bga.github.io/schoolBoardMoney/districtMap/"></side-chain>
-```
